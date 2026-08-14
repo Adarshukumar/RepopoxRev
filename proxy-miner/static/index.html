@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proxy Miner — Dashboard</title>
+<style>
+  :root {
+    --bg: #070b14;
+    --bg2: #0b1220;
+    --panel: #0f1626;
+    --panel2: #131c30;
+    --border: #1e293b;
+    --border2: #273449;
+    --text: #e2e8f0;
+    --muted: #8b9bb4;
+    --dim: #5b6b82;
+    --accent: #38bdf8;
+    --accent2: #2563eb;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(56,189,248,.08), transparent 60%),
+      radial-gradient(900px 500px at -10% 0%, rgba(37,99,235,.10), transparent 55%),
+      var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ---------- header ---------- */
+  header {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+    padding: 14px 22px;
+    background: rgba(7,11,20,.82);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+  }
+  .brand { display: flex; align-items: center; gap: 11px; font-size: 19px; font-weight: 800; letter-spacing: .2px; }
+  .brand .snake { font-size: 24px; }
+  .brand small { font-weight: 500; color: var(--dim); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+  .spacer { flex: 1; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;
+    border: 1px solid var(--border); background: var(--panel);
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .dot.busy { background: var(--amber); box-shadow: 0 0 8px var(--amber); animation: pulse 1s infinite; }
+  .dot.err { background: var(--red); box-shadow: 0 0 8px var(--red); }
+  @keyframes pulse { 50% { opacity: .35; } }
+
+  /* ---------- layout ---------- */
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 20px 22px 60px; }
+
+  .card {
+    background: linear-gradient(180deg, var(--panel2), var(--panel));
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+
+  /* ---------- mine controls ---------- */
+  .controls { padding: 16px 18px; display: flex; flex-direction: column; gap: 14px; margin-top: 16px; }
+  .controls .row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .chip {
+    cursor: pointer; user-select: none;
+    padding: 7px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
+    border: 1px solid var(--border2); background: var(--panel); color: var(--muted);
+    transition: .15s;
+  }
+  .chip.on { background: rgba(56,189,248,.12); border-color: var(--accent); color: var(--accent); }
+  .chip .count { opacity: .6; font-size: 11px; }
+  input[type="range"] { accent-color: var(--accent); }
+  input[type="number"], select, .txt {
+    background: #0a1120; border: 1px solid var(--border2); color: var(--text);
+    padding: 8px 11px; border-radius: 9px; font-size: 13px; outline: none;
+  }
+  input[type="number"]:focus, select:focus, .txt:focus { border-color: var(--accent); }
+  .btn {
+    cursor: pointer; border: 0; border-radius: 10px; padding: 10px 18px;
+    font-size: 13.5px; font-weight: 700; color: #06121f;
+    background: linear-gradient(135deg, #38bdf8, #2563eb);
+    box-shadow: 0 4px 18px rgba(37,99,235,.35);
+    transition: transform .1s, filter .15s;
+  }
+  .btn:hover { filter: brightness(1.08); }
+  .btn:active { transform: scale(.97); }
+  .btn:disabled { opacity: .5; cursor: wait; filter: none; }
+  .btn.ghost { background: transparent; color: var(--muted); border: 1px solid var(--border2); box-shadow: none; }
+
+  /* progress bar */
+  .progress { height: 8px; border-radius: 6px; background: var(--border); overflow: hidden; display: none; margin-top: 2px; }
+  .progress > div { height: 100%; width: 0; border-radius: 6px; background: linear-gradient(90deg, #38bdf8, #34d399); transition: width .3s; }
+
+  /* ---------- stats ---------- */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-top: 16px; }
+  .stat { padding: 16px 18px; }
+  .stat .n { font-size: 27px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .stat .l { font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: .09em; margin-top: 4px; }
+  .stat .s { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+  /* ---------- tabs ---------- */
+  .tabs { display: flex; gap: 4px; margin: 20px 0 14px; border-bottom: 1px solid var(--border); }
+  .tab {
+    cursor: pointer; padding: 10px 18px; font-size: 13.5px; font-weight: 600;
+    color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.on { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .panel { display: none; }
+  .panel.on { display: block; }
+
+  /* ---------- table ---------- */
+  .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .toolbar .grow { flex: 1; min-width: 180px; }
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th { color: var(--dim); font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; position: sticky; top: 0; background: var(--panel); }
+  tbody tr:hover { background: rgba(56,189,248,.05); }
+  .mono { font-family: var(--mono); color: var(--accent); cursor: pointer; }
+  .mono:hover { text-decoration: underline; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10.5px; font-weight: 700; letter-spacing: .03em; background: #1a2740; color: #cbd5e1; margin: 1px; }
+  .badge.http { background: rgba(52,211,153,.15); color: #6ee7b7; }
+  .badge.https { background: rgba(56,189,248,.15); color: #7dd3fc; }
+  .badge.socks4 { background: rgba(251,191,36,.14); color: #fcd34d; }
+  .badge.socks5 { background: rgba(192,132,252,.16); color: #d8b4fe; }
+  .muted { color: var(--dim); }
+  .flag { font-size: 15px; margin-right: 5px; }
+  .pager { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+  .pager .info { color: var(--muted); font-size: 12.5px; }
+
+  /* ---------- analytics ---------- */
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+  .chart { padding: 16px 18px; }
+  .chart h3 { margin: 0 0 14px; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+  .bar-row { display: grid; grid-template-columns: 90px 1fr 60px; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 12.5px; }
+  .bar-row .k { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-row .v { text-align: right; color: var(--dim); font-variant-numeric: tabular-nums; }
+  .bar-track { height: 12px; background: var(--border); border-radius: 6px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, #2563eb, #38bdf8); }
+
+  /* ---------- logs ---------- */
+  .terminal {
+    font-family: var(--mono); font-size: 12px; line-height: 1.55;
+    background: #060a12; border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 16px; height: 460px; overflow-y: auto; white-space: pre-wrap; word-break: break-word;
+  }
+  .terminal .t-warn { color: var(--amber); }
+  .terminal .t-err { color: var(--red); }
+  .terminal .t-ok { color: var(--green); }
+
+  /* ---------- api ---------- */
+  .endpoint { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .endpoint:last-child { border-bottom: 0; }
+  .method { font-weight: 800; font-size: 11px; padding: 3px 9px; border-radius: 6px; letter-spacing: .05em; min-width: 52px; text-align: center; }
+  .method.get { background: rgba(52,211,153,.15); color: #6ee7b7; }
+  .method.post { background: rgba(251,191,36,.15); color: #fcd34d; }
+  .ep-path { font-family: var(--mono); font-size: 13px; color: var(--accent); }
+  .ep-desc { color: var(--muted); font-size: 12.5px; width: 100%; margin-top: 4px; padding-left: 64px; }
+
+  footer { text-align: center; color: var(--dim); font-size: 12px; padding: 26px; }
+
+  /* toast */
+  #toasts { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 100; }
+  .toast {
+    background: var(--panel2); border: 1px solid var(--border2); border-left: 3px solid var(--accent);
+    padding: 12px 16px; border-radius: 10px; font-size: 13px; box-shadow: 0 8px 30px rgba(0,0,0,.5);
+    animation: slidein .2s ease; max-width: 340px;
+  }
+  .toast.ok { border-left-color: var(--green); }
+  .toast.err { border-left-color: var(--red); }
+  @keyframes slidein { from { transform: translateX(20px); opacity: 0; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><span class="snake">🐍</span> Proxy Miner <small>v2</small></div>
+  <div class="pill" id="status-pill"><span class="dot" id="status-dot"></span><span id="status-text">connecting…</span></div>
+  <div class="spacer"></div>
+  <div class="pill">🕒 uptime <b id="uptime" style="margin-left:4px">–</b></div>
+  <div class="pill">🗄 DB <b id="db-count" style="margin-left:4px">–</b></div>
+  <button class="btn" id="btn-mine-top" onclick="tabTo('proxies'); startMine()">⛏ Mine now</button>
+</header>
+
+<div class="wrap">
+
+  <!-- mine controls -->
+  <div class="card controls">
+    <div class="row" style="justify-content:space-between">
+      <div style="font-weight:700">Mining controls</div>
+      <div class="muted" style="font-size:12px">pages capped at <b>20</b> per provider · providers run in parallel</div>
+    </div>
+    <div class="row" id="provider-chips"><span class="muted">loading providers…</span></div>
+    <div class="row">
+      <label class="muted" for="pages-num">Pages / provider:</label>
+      <input type="range" id="pages-range" min="1" max="20" value="5" style="width:200px" oninput="syncPages('num')">
+      <input type="number" id="pages-num" min="1" max="20" value="5" style="width:70px" oninput="syncPages('range')">
+      <button class="btn" id="btn-mine" onclick="startMine()">⛏ Mine now</button>
+      <div id="mine-status" class="muted" style="font-size:12.5px"></div>
+    </div>
+    <div class="progress" id="mine-progress"><div id="mine-bar"></div></div>
+    <div class="row" style="padding-top:2px">
+      <span class="muted" style="font-size:12.5px">🔄 Auto-refresh (self-maintenance):</span>
+      <select id="auto-sel" onchange="applyScheduler(this.value)">
+        <option value="0">Off</option>
+        <option value="5">every 5 min</option>
+        <option value="15">every 15 min</option>
+        <option value="30">every 30 min</option>
+        <option value="60">every 60 min</option>
+      </select>
+      <span class="muted" style="font-size:12px" id="auto-state"></span>
+    </div>
+  </div>
+
+  <!-- stats -->
+  <div class="stats" id="stats"></div>
+
+  <!-- tabs -->
+  <div class="tabs">
+    <div class="tab on" data-t="proxies" onclick="tab('proxies')">🌐 Proxies</div>
+    <div class="tab" data-t="analytics" onclick="tab('analytics')">📊 Analytics</div>
+    <div class="tab" data-t="logs" onclick="tab('logs')">🖥 Logs</div>
+    <div class="tab" data-t="api" onclick="tab('api')">🔌 API</div>
+  </div>
+
+  <!-- ======================= PROXIES ======================= -->
+  <div class="panel on" id="panel-proxies">
+    <div class="card">
+      <div class="toolbar">
+        <input class="txt grow" id="f-q" placeholder="🔍 search ip / proxy / country / city…" oninput="debouncedRender()">
+        <select id="f-protocol" onchange="render()"><option value="">protocol: all</option></select>
+        <select id="f-cc" onchange="render()"><option value="">country: all</option></select>
+        <select id="f-anon" onchange="render()"><option value="">anonymity: all</option></select>
+        <select id="f-src" onchange="render()"><option value="">source: all</option></select>
+        <select id="f-sort" onchange="render()">
+          <option value="proxy">sort: ip</option>
+          <option value="port">sort: port</option>
+          <option value="country">sort: country</option>
+          <option value="source">sort: source</option>
+          <option value="updated">sort: updated</option>
+        </select>
+        <select id="f-order" onchange="render()"><option value="asc">↑ asc</option><option value="desc">↓ desc</option></select>
+        <a href="/api/export" target="_blank" class="btn ghost">⬇ JSON</a>
+        <a href="/api/proxies/raw" target="_blank" class="btn ghost">📄 raw list</a>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>Proxy (click to copy)</th><th>Country</th><th>Protocols</th><th>Anonymity</th>
+            <th>Delay</th><th>Uptime</th><th>Source</th><th>Updated</th>
+          </tr></thead>
+          <tbody id="rows"><tr><td colspan="8" class="muted">loading…</td></tr></tbody>
+        </table>
+      </div>
+      <div class="pager">
+        <div class="info" id="pager-info">–</div>
+        <div class="spacer"></div>
+        <select id="f-limit" onchange="page=0; render()">
+          <option value="25">25 / page</option>
+          <option value="50" selected>50 / page</option>
+          <option value="100">100 / page</option>
+        </select>
+        <button class="btn ghost" onclick="goPage(-1)">← prev</button>
+        <span class="muted" id="page-ind">1 / 1</span>
+        <button class="btn ghost" onclick="goPage(1)">next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= ANALYTICS ======================= -->
+  <div class="panel" id="panel-analytics">
+    <div class="grid2">
+      <div class="card chart"><h3>Protocol distribution</h3><div id="chart-protocols"></div></div>
+      <div class="card chart"><h3>Top countries</h3><div id="chart-countries"></div></div>
+      <div class="card chart"><h3>By source</h3><div id="chart-sources"></div></div>
+      <div class="card chart"><h3>Dataset health</h3><div id="chart-health"></div></div>
+    </div>
+  </div>
+
+  <!-- ======================= LOGS ======================= -->
+  <div class="panel" id="panel-logs">
+    <div class="toolbar card" style="margin-bottom:12px; border-radius:12px">
+      <b>Server console</b>
+      <label class="muted" style="font-size:12px"><input type="checkbox" id="log-pause" style="vertical-align:middle"> pause</label>
+      <div class="spacer"></div>
+      <a href="/api/logs?tail=500" target="_blank" class="btn ghost">open raw logs ↗</a>
+    </div>
+    <div class="terminal" id="terminal">connecting to server log stream…</div>
+  </div>
+
+  <!-- ======================= API ======================= -->
+  <div class="panel" id="panel-api">
+    <div class="card" id="api-docs" style="padding:8px 0"></div>
+  </div>
+
+  <footer>🐍 Proxy Miner v2 · SQLite dataset (<span id="db-path">–</span>) · self-maintaining server · pure stdlib</footer>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+let page = 0, perPage = 50, stats = null, activeRunId = null, logPaused = false, autoUp = true;
+
+/* ---------------- utils ---------------- */
+async function j(url, opts) {
+  const r = await fetch(url, opts);
+  if (!r.ok) {
+    const d = await r.json().catch(()=>({}));
+    throw new Error((d.message || d.error || (r.status + ' ' + r.statusText)) + ' [' + r.status + ']');
+  }
+  return r.json();
+}
+function toast(msg, kind) {
+  const t = document.createElement('div');
+  t.className = 'toast ' + (kind || '');
+  t.textContent = msg;
+  $('toasts').appendChild(t);
+  setTimeout(() => t.remove(), 4200);
+}
+function fmtUptime(s) {
+  if (s == null) return '–';
+  const d = Math.floor(s/86400), h = Math.floor(s%86400/3600), m = Math.floor(s%3600/60), ss = s%60;
+  return (d?d+'d ':'') + (h?h+'h ':'') + (m?m+'m ':'') + ss+'s';
+}
+let renderTimer = null;
+function debouncedRender(){ clearTimeout(renderTimer); renderTimer = setTimeout(render, 250); }
+
+/* ---------------- tabs ---------------- */
+function tab(name){
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.t === name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  $('panel-' + name).classList.add('on');
+  if (name === 'analytics') renderAnalytics();
+  if (name === 'logs') refreshLogs();
+}
+function tabTo(name){ tab(name); }
+
+/* ---------------- stats ---------------- */
+async function refreshStats(){
+  try {
+    stats = await j('/api/stats');
+    const st = $('stats');
+    const run = stats.active_run, lr = stats.last_run;
+    const srcKeys = Object.keys(stats.sources || {});
+    st.innerHTML = `
+      <div class="card stat"><div class="n">${stats.count.toLocaleString()}</div><div class="l">Proxies in DB</div></div>
+      <div class="card stat"><div class="n">${stats.providers.length}</div><div class="l">Providers</div><div class="s">${stats.providers.map(p=>p.name).join(', ')}</div></div>
+      <div class="card stat"><div class="n">${stats.countries.length}</div><div class="l">Countries</div></div>
+      <div class="card stat"><div class="n">${stats.protocols.length}</div><div class="l">Protocols</div><div class="s">${stats.protocols.join(' · ')}</div></div>
+      <div class="card stat"><div class="n">${lr ? (lr.duration_ms/1000).toFixed(1)+'s' : '–'}</div><div class="l">Last run</div><div class="s">${lr ? (lr.inserted+'+ / '+lr.updated+'~') : ''} ${lr ? new Date(lr.finished).toLocaleTimeString() : 'never'}</div></div>
+      <div class="card stat"><div class="n">${fmtUptime(stats.server.uptime_seconds)}</div><div class="l">Server uptime</div><div class="s">${srcKeys.length ? 'sources: '+srcKeys.join(', ') : ''}</div></div>`;
+    $('db-count').textContent = stats.count.toLocaleString();
+    $('uptime').textContent = fmtUptime(stats.server.uptime_seconds);
+    $('db-path').textContent = stats.server.db_path.split('/').slice(-2).join('/');
+
+    // status pill
+    const dot = $('status-dot'), txt = $('status-text');
+    if (run && run.state === 'running') { dot.className = 'dot busy'; txt.textContent = 'mining… ' + run.done + '/' + (run.total||'?') + ' pages'; }
+    else if (stats.last_error) { dot.className = 'dot err'; txt.textContent = 'last error: ' + stats.last_error.error; }
+    else { dot.className = 'dot'; txt.textContent = 'healthy · ' + stats.count.toLocaleString() + ' proxies'; }
+
+    // auto-refresh state
+    const sc = stats.scheduler;
+    $('auto-state').textContent = sc.enabled ? `(on · every ${sc.interval_min} min · ${sc.pages} pages)` : '(off)';
+    if (document.activeElement !== $('auto-sel')) $('auto-sel').value = sc.enabled ? String(sc.interval_min) : '0';
+    syncPages('keep');
+    return stats;
+  } catch(e) { $('status-text').textContent = 'unreachable'; }
+}
+
+/* ---------------- provider chips ---------------- */
+async function loadProviders(){
+  const d = await j('/api/providers');
+  const srcs = (stats && stats.sources) || {};
+  $('provider-chips').innerHTML = d.providers.map(p => `
+    <span class="chip on" data-prov="${p.name}" onclick="toggleChip(this)">
+      ${p.name} <span class="count">${(srcs[p.name]||0).toLocaleString()}</span>
+    </span>`).join('');
+}
+function toggleChip(el){ el.classList.toggle('on'); }
+function selectedProviders(){
+  return [...document.querySelectorAll('#provider-chips .chip.on')].map(c => c.dataset.prov);
+}
+
+/* ---------------- mining ---------------- */
+function syncPages(src){
+  let v;
+  if (src === 'num') { v = parseInt($('pages-num').value, 10) || 1; v = Math.min(20, Math.max(1, v)); $('pages-range').value = v; }
+  else if (src === 'range') { v = parseInt($('pages-range').value, 10); $('pages-num').value = v; }
+  else { v = parseInt($('pages-range').value, 10); }
+}
+async function startMine(){
+  const provs = selectedProviders();
+  const pages = parseInt($('pages-num').value, 10) || 5;
+  if (pages < 1 || pages > 20) return toast('pages must be 1–20', 'err');
+  const q = new URLSearchParams({ pages });
+  provs.forEach(p => q.append('provider', p));
+  const b = $('btn-mine'); b.disabled = true; b.textContent = 'Mining…';
+  $('btn-mine-top').disabled = true; $('btn-mine-top').textContent = 'Mining…';
+  $('mine-progress').style.display = 'block'; $('mine-bar').style.width = '2%';
+  $('mine-status').textContent = 'starting…';
+  try {
+    const d = await j('/api/mine?' + q, { method: 'POST' });
+    if (d.status === 'started') { activeRunId = d.run.id; toast('run started: ' + d.run.providers.join(', ') + ' × ' + pages + ' pages'); pollRun(); }
+  } catch(e) {
+    if (String(e.message).includes('busy') || String(e.message).includes('409')) toast('a mining run is already in progress', 'err');
+    else toast('mine failed: ' + e.message, 'err');
+    resetMineBtn();
+  }
+}
+function resetMineBtn(){
+  $('btn-mine').disabled = false; $('btn-mine').textContent = '⛏ Mine now';
+  $('btn-mine-top').disabled = false; $('btn-mine-top').textContent = '⛏ Mine now';
+}
+async function pollRun(){
+  if (!activeRunId) return;
+  try {
+    const r = await j('/api/run/' + activeRunId);
+    const pct = r.total ? Math.round(r.done/r.total*100) : 0;
+    $('mine-bar').style.width = Math.max(2, pct) + '%';
+    $('mine-status').textContent = `${r.state}: ${r.done}/${r.total||'?'} pages · +${r.inserted} new · ~${r.updated} updated`;
+    if (r.state === 'running') return setTimeout(pollRun, 1000);
+    // finished
+    if (r.state === 'done') toast(`✔ done in ${(r.duration_ms/1000).toFixed(1)}s — +${r.inserted} new, ~${r.updated} updated`, 'ok');
+    else toast('✖ run error: ' + r.error, 'err');
+    activeRunId = null;
+    $('mine-progress').style.display = 'none'; $('mine-bar').style.width = '0';
+    $('mine-status').textContent = '';
+    resetMineBtn(); refreshStats(); render();
+  } catch(e){ setTimeout(pollRun, 1500); }
+}
+
+/* ---------------- scheduler ---------------- */
+async function applyScheduler(v){
+  try {
+    await j('/api/scheduler?enabled=' + (v !== '0' ? '1' : '0') + (v !== '0' ? '&interval_min=' + v : ''), { method: 'POST' });
+    toast(v === '0' ? 'auto-refresh off' : 'auto-refresh on: every ' + v + ' min', 'ok');
+  } catch(e){ toast('scheduler error: ' + e.message, 'err'); }
+  refreshStats();
+}
+
+/* ---------------- proxies table ---------------- */
+async function render(){
+  const q = new URLSearchParams({ limit: perPage, offset: page * perPage });
+  const f = id => $(id).value.trim();
+  if (f('f-q')) q.set('q', f('f-q'));
+  if (f('f-protocol')) q.set('protocol', f('f-protocol'));
+  if (f('f-cc')) q.set('country_code', f('f-cc'));
+  if (f('f-anon')) q.set('anonymity', f('f-anon'));
+  if (f('f-src')) q.set('source', f('f-src'));
+  q.set('sort', f('f-sort')); q.set('order', f('f-order'));
+  try {
+    const d = await j('/api/proxies?' + q);
+    $('rows').innerHTML = d.proxies.map(p => `
+      <tr>
+        <td class="mono" title="copy ${p.proxy}" onclick="copyProxy('${p.proxy}')">${p.proxy}</td>
+        <td>${p.flag||''} ${p.country_code ? '<b>'+p.country_code+'</b>' : '–'} <span class="muted">${p.country||''}</span></td>
+        <td>${(p.protocols||[]).map(x=>`<span class="badge ${x.toLowerCase()}">${x}</span>`).join('')}</td>
+        <td>${p.anonymity||'<span class="muted">–</span>'}</td>
+        <td>${p.delay||'–'}</td>
+        <td>${p.uptime||'–'}</td>
+        <td><span class="muted">${p.source||'–'}</span></td>
+        <td class="muted">${(p.last_updated||'').slice(0,16)}</td>
+      </tr>`).join('') || '<tr><td colspan="8" class="muted">no proxies match — try different filters or hit ⛏ Mine now</td></tr>';
+    $('pager-info').textContent = `showing ${d.count.toLocaleString()} of ${d.total_available.toLocaleString()} proxies`;
+    $('page-ind').textContent = `${d.page} / ${Math.max(1,d.total_pages)}`;
+  } catch(e) { $('rows').innerHTML = `<tr><td colspan="8" class="muted">${e.message}</td></tr>`; }
+}
+function goPage(dir){ const p = page + dir; if (p < 0) return; page = p; render(); }
+function copyProxy(ip){
+  const done = () => toast('copied ' + ip, 'ok');
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ip).then(done).catch(() => fallbackCopy(ip, done));
+  else fallbackCopy(ip, done);
+}
+function fallbackCopy(t, cb){
+  const el = document.createElement('textarea'); el.value = t; document.body.appendChild(el);
+  el.select(); try { document.execCommand('copy'); cb(); } catch(e){} el.remove();
+}
+
+/* ---------------- analytics ---------------- */
+function barRows(data){
+  return data.map(([k, v, w]) => `
+    <div class="bar-row"><span class="k" title="${k}">${k}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${w}%"></div></div>
+      <span class="v">${v.toLocaleString()}</span></div>`).join('') || '<span class="muted">no data</span>';
+}
+function pct(n){ return Math.max(1, Math.round(n / Math.max(1, stats.count) * 100)); }
+function renderAnalytics(){
+  if (!stats) return;
+  const pc = stats.protocol_counts || {}, cc = stats.country_counts || {}, src = stats.sources || {};
+  const top = arr => arr.map(([k, v]) => [k, v, pct(v)]);
+  const fmt = (k, v) => v.toLocaleString();
+  $('chart-protocols').innerHTML = barRows(top(Object.entries(pc)));
+  $('chart-countries').innerHTML = barRows(top(Object.entries(cc)));
+  $('chart-sources').innerHTML = barRows(top(Object.entries(src)));
+  const lr = stats.last_run;
+  $('chart-health').innerHTML = `
+    <div class="bar-row"><span class="k">unique keys</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="v">${(stats.count||0).toLocaleString()}</span></div>
+    <div class="bar-row"><span class="k">multi-proto</span><div class="bar-track"><div class="bar-fill" style="width:${pct(Object.values(pc).reduce((a,b)=>a+b,0) - Object.values(pc).length)}%"></div></div><span class="v">${Object.keys(pc).length} protos</span></div>
+    <div class="bar-row"><span class="k">providers</span><div class="bar-track"><div class="bar-fill" style="width:${pct(stats.providers.length*100)}%"></div></div><span class="v">${stats.providers.length}</span></div>
+    <div class="bar-row"><span class="k">countries</span><div class="bar-track"><div class="bar-fill" style="width:${Math.min(100, stats.countries.length)}%"></div></div><span class="v">${stats.countries.length}</span></div>
+    <div class="muted" style="margin-top:12px;font-size:12.5px">
+      last run: ${lr ? (lr.inserted+'+ inserted · '+lr.updated+'~ updated · '+(lr.duration_ms/1000).toFixed(1)+'s') : 'never'}
+      ${lr ? '<br>at ' + lr.finished : ''}
+    </div>`;
+}
+
+/* ---------------- logs ---------------- */
+async function refreshLogs(){
+  if (logPaused || !$('panel-logs').classList.contains('on')) return;
+  try {
+    const d = await j('/api/logs?tail=200');
+    const term = $('terminal');
+    const stick = term.scrollTop + term.clientHeight >= term.scrollHeight - 30;
+    term.innerHTML = d.logs.map(l => {
+      let cls = '';
+      if (/error|✖|traceback/i.test(l)) cls = 't-err';
+      else if (/warn|warning/i.test(l)) cls = 't-warn';
+      else if (/✔|done|ok/i.test(l)) cls = 't-ok';
+      return `<div class="${cls}">${l.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</div>`;
+    }).join('');
+    if (stick) term.scrollTop = term.scrollHeight;
+  } catch(e){}
+}
+
+/* ---------------- api docs ---------------- */
+function renderApi(){
+  const eps = [
+    ['GET','/api/proxies?protocol=SOCKS5&country_code=US&q=104&sort=proxy&order=asc&limit=50&offset=0','list proxies — filters, search, sort, pagination'],
+    ['GET','/api/proxies/raw','plain text ip:port list (one per line)'],
+    ['GET','/api/stats','dataset + runtime stats (counts, sources, scheduler, active run)'],
+    ['GET','/api/health','health: uptime, db health, scheduler, active run, last error'],
+    ['GET','/api/providers','registered providers'],
+    ['GET','/api/logs?tail=200','recent server logs (this console)'],
+    ['GET','/api/export','download the full dataset as JSON'],
+    ['GET','/api/run &nbsp;·&nbsp; /api/run/run-1','mining-run status (live progress)'],
+    ['POST','/api/mine?provider=nodemaven&provider=proxymix&pages=20','start a mining run (pages ≤ 20, providers in parallel)'],
+    ['POST','/api/scheduler?enabled=1&interval_min=30&pages=5','configure auto-refresh (self-maintenance)'],
+  ];
+  $('api-docs').innerHTML = eps.map(([m, p, d]) => `
+    <div class="endpoint">
+      <span class="method ${m.toLowerCase()}">${m}</span>
+      <span class="ep-path">${p}</span>
+      <div class="ep-desc">${d}</div>
+    </div>`).join('');
+}
+
+/* ---------------- boot ---------------- */
+(async function boot(){
+  renderApi();
+  try {
+    await refreshStats();
+    await loadProviders();
+  } catch(e){ toast('cannot reach API: ' + e.message, 'err'); }
+  render();
+  setInterval(refreshStats, 5000);
+  setInterval(refreshLogs, 2000);
+  $('log-pause').addEventListener('change', e => { logPaused = e.target.checked; if(!logPaused) refreshLogs(); });
+})();
+</script>
+</body>
+</html>
