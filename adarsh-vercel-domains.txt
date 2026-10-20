@@ -1,0 +1,67 @@
+Adarsh-related vercel.app domains (deduplicated, verified from search)
+=====================================================================
+Source: web search results for "adarsh vercel.app" / "site:vercel.app adarsh"
+Collected: 2026-10-21
+Branch: arena/46074d41-repopoxrev
+
+Total unique domains: 54 (incl. adarshu.vercel.app example)
+
+1.  https://aadarsh-portfolio.vercel.app/
+2.  https://aadarshkannan.vercel.app/
+3.  https://adarsh.vercel.app/
+4.  https://adarsh-computers.vercel.app/
+5.  https://adarsh-gules.vercel.app/
+6.  https://adarsh-maurya.vercel.app/
+7.  https://adarsh-myportfolio.vercel.app/
+8.  https://adarsh-prakashsingh.vercel.app/
+9.  https://adarsh-tutions.vercel.app/
+10. https://adarsh-upadhyay.vercel.app/
+11. https://adarsh005.vercel.app/
+12. https://adarshdev-portfolio.vercel.app/
+13. https://adarshdwivedi.vercel.app/
+14. https://adarshgupta.vercel.app/
+15. https://adarshguptaa.vercel.app/
+16. https://adarshkumar007.vercel.app/
+17. https://adarshlkdev.vercel.app/
+18. https://adarshm-blog.vercel.app/
+19. https://adarshsingh.vercel.app/
+20. https://adarshsinghdev.vercel.app/
+21. https://adarshsinghh.vercel.app/
+22. https://adarshtiwari.vercel.app/
+23. https://adar.vercel.app/
+24. https://adarrrrsh.vercel.app/
+25. https://adarshjaiss.vercel.app/
+26. https://adarshpatel.vercel.app/
+27. https://adarsh-portfolio-lime.vercel.app/
+28. https://adarsh-portfolio-tan.vercel.app/
+29. https://adarsh-portfolio-lyart.vercel.app/
+30. https://adarsh-portfolio-dzppijbiq-adarsh-patil.vercel.app/
+31. https://adarsh-portfolio-weld.vercel.app/
+32. https://adarsh-portfolio-indol.vercel.app/
+33. https://adarshrai.vercel.app/
+34. https://adarsh-techie.vercel.app/
+35. https://adarshthapa.vercel.app/
+36. https://adarshu.vercel.app/
+37. https://aj-niplex.vercel.app/
+38. https://anexus-portfolio.vercel.app/
+39. https://dev-adarsh.vercel.app/
+40. https://devadarsh.vercel.app/
+41. https://3-d-portfolio-xi-tan.vercel.app/
+42. https://portfolio-adarsh-3d.vercel.app/
+43. https://portfolio-adarsh-b778.vercel.app/
+44. https://portfolio-adarsh-kashyap.vercel.app/
+45. https://portfolio-website-adarsh.vercel.app/
+46. https://portfolio-new-adarsh-verma.vercel.app/
+47. https://portfolio-gamma-sooty-43.vercel.app/
+48. https://portfolio-hazel-nine-27.vercel.app/
+49. https://personal-portfolio-website-nine-pi.vercel.app/
+50. https://profile-website-theta-three.vercel.app/
+51. https://portfolio-flax-five-15.vercel.app/
+52. https://snaps-by-adarsh.vercel.app/
+53. https://thisisadarshsingh.vercel.app/
+54. https://xadarsh.vercel.app/
+
+Note: Listed exactly as found in search results. Sub-paths (e.g. /about, /team)
+were dropped to keep one entry per domain so there are no duplicates.
+Verify live status before use — Vercel subdomains can be removed by their
+owners at any time.
