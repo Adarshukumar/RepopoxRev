@@ -1,0 +1,881 @@
+{
+  "summary": {
+    "PASS": 28,
+    "INFO": 6,
+    "FAIL": 4,
+    "WARN": 4
+  },
+  "stats": {
+    "gradle_modules": [
+      ":app",
+      ":providers:canvas",
+      ":providers:innertube",
+      ":providers:kugou",
+      ":providers:lrclib",
+      ":providers:lastfm",
+      ":providers:betterlyrics",
+      ":providers:simpmusic",
+      ":providers:youlyplus",
+      ":providers:shazamkit",
+      ":providers:artistvideo",
+      ":providers:applecanvas",
+      ":providers:paxsenixlyrics",
+      ":providers:directlyrics",
+      ":providers:musixmatch",
+      ":providers:genius",
+      ":providers:wikipedia",
+      ":modules:api",
+      ":modules:bridge",
+      ":modules:applemusic",
+      ":modules:monochrome",
+      ":modules:jiosaavn"
+    ],
+    "catalog": {
+      "versions": 43,
+      "libraries": 71,
+      "plugins": 5,
+      "used_libs": 68,
+      "used_plugins": 5,
+      "used_versions": 2,
+      "unused_libs": [
+        "compose-material-icons-core",
+        "compose-material-icons-extended",
+        "json"
+      ]
+    },
+    "application_id": "com.mochyy.mochymusic",
+    "permissions": [
+      "android.permission.ACCESS_NETWORK_STATE",
+      "android.permission.BLUETOOTH",
+      "android.permission.BLUETOOTH_ADMIN",
+      "android.permission.BLUETOOTH_CONNECT",
+      "android.permission.FOREGROUND_SERVICE",
+      "android.permission.FOREGROUND_SERVICE_DATA_SYNC",
+      "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+      "android.permission.INTERNET",
+      "android.permission.MODIFY_AUDIO_SETTINGS",
+      "android.permission.POST_NOTIFICATIONS",
+      "android.permission.READ_EXTERNAL_STORAGE",
+      "android.permission.READ_MEDIA_AUDIO",
+      "android.permission.RECEIVE_BOOT_COMPLETED",
+      "android.permission.RECORD_AUDIO",
+      "android.permission.REQUEST_INSTALL_PACKAGES",
+      "android.permission.VIBRATE",
+      "android.permission.WAKE_LOCK"
+    ],
+    "icon_aliases": [
+      "IconDefault",
+      "IconMarkWhite",
+      "IconMarkBlack",
+      "IconMarkMaterial",
+      "IconMarkTransparent",
+      "IconOutline",
+      "IconOutlineWhite",
+      "IconOutlineBlack",
+      "IconOutlineMaterial",
+      "IconOutlineTransparent",
+      "IconAnimeWhite",
+      "IconAnimeDark",
+      "IconAnimeMaterial",
+      "IconAnimeTransparent",
+      "IconMarkRed",
+      "IconMarkOrange",
+      "IconMarkYellow",
+      "IconMarkGreen",
+      "IconMarkTeal",
+      "IconMarkSky",
+      "IconMarkBlue",
+      "IconMarkIndigo",
+      "IconMarkPurple",
+      "IconMarkPink",
+      "IconMarkGraphite",
+      "IconMarkCream",
+      "IconOutlineRed",
+      "IconOutlineOrange",
+      "IconOutlineYellow",
+      "IconOutlineGreen",
+      "IconOutlineTeal",
+      "IconOutlineSky",
+      "IconOutlineBlue",
+      "IconOutlineIndigo",
+      "IconOutlinePurple",
+      "IconOutlinePink",
+      "IconOutlineGraphite",
+      "IconOutlineCream",
+      "IconAnimeRed",
+      "IconAnimeOrange",
+      "IconAnimeYellow",
+      "IconAnimeGreen",
+      "IconAnimeTeal",
+      "IconAnimeSky",
+      "IconAnimeBlue",
+      "IconAnimeIndigo",
+      "IconAnimePurple",
+      "IconAnimePink",
+      "IconAnimeGraphite",
+      "IconAnimeCream"
+    ],
+    "resource_refs_scanned": 2897,
+    "resource_types": {
+      "array": 1,
+      "color": 27,
+      "drawable": 315,
+      "font": 14,
+      "layout": 4,
+      "mipmap": 52,
+      "plurals": 18,
+      "raw": 13,
+      "string": 1927,
+      "style": 4,
+      "xml": 8
+    },
+    "i18n": {
+      "default_keys": 1946,
+      "locales": 83,
+      "complete": [],
+      "orphan_keys": {
+        "values-in": [
+          "bedside_clock_caption",
+          "bedside_face_analog",
+          "bedside_face_analog_caption",
+          "bedside_face_big",
+          "bedside_face_big_caption",
+          "bedside_face_cover",
+          "bedside_face_cover_caption",
+          "bedside_face_stacked",
+          "bedside_face_stacked_caption"
+        ]
+      }
+    },
+    "pkg_mismatch_count": 14,
+    "kotlin": {
+      "files": 1036,
+      "loc": 230722,
+      "declarations": 27872,
+      "largest": [
+        [
+          "app/src/main/kotlin/com/mochyy/mochymusic/playback/MusicService.kt",
+          4980
+        ],
+        [
+          "app/src/main/kotlin/com/mochyy/mochymusic/ui/player/LyricsGlowLine.kt",
+          2384
+        ],
+        [
+          "app/src/main/kotlin/com/mochyy/mochymusic/ui/player/BottomSheetPlayer.kt",
+          2078
+        ],
+        [
+          "app/src/main/kotlin/com/mochyy/mochymusic/ui/player/MorphingCover.kt",
+          2055
+        ],
+        [
+          "app/src/main/kotlin/com/mochyy/mochymusic/db/DatabaseDao.kt",
+          2030
+        ],
+        [
+          "app/src/main/kotlin/com/mochyy/mochymusic/ui/component/HeroCarousel.kt",
+          2014
+        ],
+        [
+          "app/src/main/kotlin/com/mochyy/mochymusic/ui/screens/HomeScreen.kt",
+          1900
+        ],
+        [
+          "providers/innertube/src/main/kotlin/com/music/innertube/YouTube.kt",
+          1809
+        ],
+        [
+          "app/src/main/kotlin/com/mochyy/mochymusic/MainActivity.kt",
+          1712
+        ],
+        [
+          "app/src/main/kotlin/com/mochyy/mochymusic/ui/component/detail/PlaylistDetail.kt",
+          1681
+        ],
+        [
+          "app/src/main/kotlin/com/mochyy/mochymusic/lyrics/LyricsUtils.kt",
+          1633
+        ],
+        [
+          "app/src/main/kotlin/com/mochyy/mochymusic/ui/component/Items.kt",
+          1534
+        ]
+      ]
+    },
+    "room": {
+      "version": 42,
+      "migrations": [
+        [
+          1,
+          2
+        ],
+        [
+          21,
+          24
+        ],
+        [
+          22,
+          24
+        ],
+        [
+          24,
+          25
+        ],
+        [
+          35,
+          36
+        ],
+        [
+          36,
+          37
+        ],
+        [
+          37,
+          38
+        ],
+        [
+          38,
+          39
+        ],
+        [
+          39,
+          40
+        ],
+        [
+          40,
+          41
+        ],
+        [
+          41,
+          42
+        ]
+      ],
+      "reachable_from": [
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42
+      ],
+      "unreachable_from": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34
+      ],
+      "entities": [
+        "SongEntity",
+        "ArtistEntity",
+        "AlbumEntity",
+        "PlaylistEntity",
+        "SongArtistMap",
+        "SongAlbumMap",
+        "AlbumArtistMap",
+        "PlaylistSongMap",
+        "SearchHistory",
+        "FormatEntity",
+        "LyricsEntity",
+        "Event",
+        "RelatedSongMap",
+        "SetVideoIdEntity",
+        "PlayCountEntity",
+        "RecognitionHistory",
+        "SpeedDialItem",
+        "PlaylistEvent",
+        "ImportedSong",
+        "ImportSession",
+        "ImportSessionSong",
+        "ImportedPlaylist",
+        "ImportedPlaylistTrack"
+      ],
+      "views": [
+        "SortedSongArtistMap",
+        "SortedSongAlbumMap",
+        "PlaylistSongMapPreview"
+      ]
+    },
+    "tests": {
+      "files": 27,
+      "classes": [
+        "CrossmixTest",
+        "TransportMovesTest",
+        "AudioLabDspTest",
+        "AutoEqTest",
+        "AppLanguageTest",
+        "LanguageResourcesTest",
+        "CsvImportTest",
+        "DateMsTest",
+        "PlaylistSourceRecordTest",
+        "TrackMatcherTest",
+        "AudioMatcherTest",
+        "CaptionAlignerTest",
+        "LyricsAutoSyncTest",
+        "LyricsUtilsTest",
+        "SkinParserTest",
+        "SincResamplerTest",
+        "VideoLetterboxTest",
+        "VideoDashTest",
+        "ChromeUserAgentTest",
+        "FrameProbeRecorderTest",
+        "AppleMusicModuleTest",
+        "loader",
+        "loader",
+        "JioSaavnModuleTest",
+        "MonochromeModuleTest",
+        "MonochromeApiCanvasTest",
+        "MusixmatchPickTest"
+      ],
+      "test_methods": 177
+    },
+    "module_deps": {
+      ":app": [
+        ":modules:api",
+        ":modules:applemusic",
+        ":modules:bridge",
+        ":modules:jiosaavn",
+        ":modules:monochrome",
+        ":providers:applecanvas",
+        ":providers:artistvideo",
+        ":providers:betterlyrics",
+        ":providers:canvas",
+        ":providers:directlyrics",
+        ":providers:genius",
+        ":providers:innertube",
+        ":providers:kugou",
+        ":providers:lastfm",
+        ":providers:lrclib",
+        ":providers:musixmatch",
+        ":providers:paxsenixlyrics",
+        ":providers:shazamkit",
+        ":providers:simpmusic",
+        ":providers:wikipedia",
+        ":providers:youlyplus"
+      ],
+      ":modules:applemusic": [
+        ":modules:api"
+      ],
+      ":modules:bridge": [
+        ":modules:api"
+      ],
+      ":modules:jiosaavn": [
+        ":modules:api"
+      ],
+      ":modules:monochrome": [
+        ":modules:api"
+      ],
+      ":providers:applecanvas": [
+        ":providers:canvas"
+      ],
+      ":providers:paxsenixlyrics": [
+        ":providers:betterlyrics"
+      ]
+    },
+    "ci": {
+      "workflows": [
+        "build.yml",
+        "build_pr.yml",
+        "stale.yml"
+      ],
+      "tasks": [
+        "assembleUniversalGmsDebug"
+      ],
+      "flavor_dimensions": {
+        "variant": [
+          "foss",
+          "fdroid",
+          "gms"
+        ],
+        "abi": [
+          "universal",
+          "arm64",
+          "armeabi",
+          "x86",
+          "x86_64"
+        ]
+      },
+      "build_types": [
+        "debug",
+        "fast",
+        "profileable",
+        "release"
+      ],
+      "variant_count": 60
+    },
+    "buildconfig": {
+      "defined": [
+        "ARCHITECTURE",
+        "BUILD_TIME_MILLIS",
+        "CAST_AVAILABLE",
+        "DISCORD_CLIENT_ID",
+        "IS_NIGHTLY",
+        "LASTFM_API_KEY",
+        "LASTFM_SECRET",
+        "LIBREFM_API_KEY",
+        "LIBREFM_SECRET"
+      ],
+      "used": [
+        "APPLICATION_ID",
+        "ARCHITECTURE",
+        "BUILD_TIME_MILLIS",
+        "BUILD_TYPE",
+        "DEBUG",
+        "DISCORD_CLIENT_ID",
+        "IS_NIGHTLY",
+        "LASTFM_API_KEY",
+        "LASTFM_SECRET",
+        "LIBREFM_API_KEY",
+        "LIBREFM_SECRET",
+        "VERSION_CODE",
+        "VERSION_NAME"
+      ],
+      "unused": [
+        "CAST_AVAILABLE"
+      ]
+    },
+    "dangling_docs": [
+      "docs/notes/audio-output.md",
+      "docs/notes/cast.md",
+      "docs/notes/modules.md",
+      "docs/notes/performance.md",
+      "docs/notes/settings.md",
+      "docs/notes/update.md",
+      "docs/popup-sheet.skill.md"
+    ],
+    "app_icons": {
+      "families": [
+        "Mark",
+        "Outline",
+        "Anime"
+      ],
+      "colours": [
+        "Red",
+        "Orange",
+        "Yellow",
+        "Green",
+        "Teal",
+        "Sky",
+        "Blue",
+        "Indigo",
+        "Purple",
+        "Pink",
+        "Graphite",
+        "Cream"
+      ],
+      "presets": [
+        "IconAnimeDark",
+        "IconAnimeMaterial",
+        "IconAnimeTransparent",
+        "IconAnimeWhite",
+        "IconDefault",
+        "IconMarkBlack",
+        "IconMarkMaterial",
+        "IconMarkTransparent",
+        "IconMarkWhite",
+        "IconOutline",
+        "IconOutlineBlack",
+        "IconOutlineMaterial",
+        "IconOutlineTransparent",
+        "IconOutlineWhite"
+      ],
+      "manifest_aliases": 50,
+      "generated": 50
+    },
+    "navigation": {
+      "declared_routes": 69,
+      "navigate_calls": 206,
+      "distinct_targets": 57,
+      "identifier_targets": [
+        "DevPlaygroundRoute",
+        "DiscordRoute",
+        "ImportProgressRoute",
+        "ImportProvidersRoute",
+        "ImportTuneMyMusicRoute",
+        "IntegrationsRoute",
+        "ProxySettingsRoute",
+        "YouTubeLoginRoute",
+        "YouTubeSyncRoute",
+        "com.mochyy.mochymusic.ui.screens.settings.importsync.ImportSyncRoute",
+        "entry.route",
+        "route"
+      ]
+    }
+  },
+  "findings": [
+    {
+      "level": "PASS",
+      "check": "gradle-modules",
+      "message": "all 22 include()d modules exist with a build script, and every project(\":\u2026\") reference (after stripping comments) is declared",
+      "evidence": [
+        "1 :app + 21 library modules",
+        "16 providers, 5 source modules"
+      ]
+    },
+    {
+      "level": "PASS",
+      "check": "version-catalog",
+      "message": "every catalog accessor in every build script resolves: 68 libraries, 5 plugins, 2 version refs",
+      "evidence": [
+        "gradle/libs.versions.toml declares 43 versions, 71 libraries, 5 plugins"
+      ]
+    },
+    {
+      "level": "INFO",
+      "check": "version-catalog",
+      "message": "[libraries] entries declared but never referenced by a build script (flavor-conditional and direct-coordinate deps land here)",
+      "evidence": [
+        "compose-material-icons-core",
+        "compose-material-icons-extended",
+        "json"
+      ]
+    },
+    {
+      "level": "FAIL",
+      "check": "manifest",
+      "message": "manifest declares a component whose class does not exist anywhere in the sources. The build still succeeds (AGP does not resolve component classes), but anything that tries to start it dies at runtime with ActivityNotFound/ClassNotFound.",
+      "evidence": [
+        "<activity> com.mochyy.mochymusic.ui.screens.CrashActivity"
+      ]
+    },
+    {
+      "level": "PASS",
+      "check": "manifest",
+      "message": "all 66 @resource references in the manifest resolve",
+      "evidence": []
+    },
+    {
+      "level": "PASS",
+      "check": "manifest",
+      "message": "2 provider authorities unique",
+      "evidence": [
+        "${applicationId}.FileProvider",
+        "${applicationId}.com.dpi.DensityScaler"
+      ]
+    },
+    {
+      "level": "INFO",
+      "check": "manifest",
+      "message": "17 permissions declared",
+      "evidence": [
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADMIN",
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_DATA_SYNC",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+        "android.permission.INTERNET",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.READ_MEDIA_AUDIO",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.REQUEST_INSTALL_PACKAGES",
+        "android.permission.VIBRATE",
+        "android.permission.WAKE_LOCK"
+      ]
+    },
+    {
+      "level": "PASS",
+      "check": "manifest",
+      "message": "exactly 1 of 50 launcher activity-alias entries enabled (IconDefault); the app swaps them at runtime",
+      "evidence": []
+    },
+    {
+      "level": "PASS",
+      "check": "manifest",
+      "message": "all 50 activity-alias icons exist",
+      "evidence": []
+    },
+    {
+      "level": "PASS",
+      "check": "resources",
+      "message": "all 763 XML files parse as well-formed XML",
+      "evidence": []
+    },
+    {
+      "level": "PASS",
+      "check": "resources",
+      "message": "every @type/name reference in XML resolves",
+      "evidence": []
+    },
+    {
+      "level": "PASS",
+      "check": "resources",
+      "message": "every R.type.name reference in Kotlin resolves",
+      "evidence": []
+    },
+    {
+      "level": "PASS",
+      "check": "resources",
+      "message": "no duplicate resource names in the default values/ configuration",
+      "evidence": []
+    },
+    {
+      "level": "PASS",
+      "check": "resources",
+      "message": "all adaptive-icon foreground/background layers resolve",
+      "evidence": []
+    },
+    {
+      "level": "WARN",
+      "check": "i18n",
+      "message": "9 string key(s) exist only in translation folders and not in default values/. Nothing references them, so this is Android lint's ExtraTranslation warning (dead translations), not a runtime crash.",
+      "evidence": [
+        "values-in: bedside_clock_caption, bedside_face_analog, bedside_face_analog_caption, bedside_face_big, bedside_face_big_caption, bedside_face_cover, bedside_face_cover_caption, bedside_face_stacked"
+      ]
+    },
+    {
+      "level": "INFO",
+      "check": "i18n",
+      "message": "1946 default keys, 83 locales, 0 fully translated (Crowdin-managed; partial coverage is normal, missing keys fall back to default)",
+      "evidence": [
+        "least: values-wae 0/1946, values-en-rCA 2/1946, values-km 20/1946, values-as 48/1946, values-fil 53/1946",
+        "most:  values-uk-rUA 1669/1946, values-vi-rVN 1669/1946, values-zh-rCN 1669/1946, values-zh-rTW 1669/1946, values-in 1726/1946"
+      ]
+    },
+    {
+      "level": "PASS",
+      "check": "kotlin",
+      "message": "all 1036 Kotlin files are lexically balanced (deepest nesting 19 levels, in app/src/main/kotlin/com/mochyy/mochymusic/MainActivity.kt)",
+      "evidence": []
+    },
+    {
+      "level": "PASS",
+      "check": "kotlin",
+      "message": "no duplicate declarations within any module+source-set; the 2 types that repeat do so only across mutually exclusive flavor source sets (foss/fdroid vs. gms), which never compile together",
+      "evidence": []
+    },
+    {
+      "level": "WARN",
+      "check": "kotlin",
+      "message": "package declaration differs from the directory path (legal Kotlin, but an IDE/navigation smell)",
+      "evidence": [
+        "providers/applecanvas/src/main/kotlin/com/music/vivi/applecanvas/AppleMusicCanvasProvider.kt declares `com.mochyy.mochymusic.applecanvas`",
+        "providers/artistvideo/src/main/kotlin/com/music/vivi/artistvideo/ArtistVideo.kt declares `com.mochyy.mochymusic.artistvideo`",
+        "providers/artistvideo/src/main/kotlin/com/music/vivi/artistvideo/ArtistVideoCanvasProvider.kt declares `com.mochyy.mochymusic.artistvideo`",
+        "providers/canvas/src/main/kotlin/com/music/vivi/canvas/AppleMusicArtistBackgroundProvider.kt declares `com.mochyy.mochymusic.canvas`",
+        "providers/canvas/src/main/kotlin/com/music/vivi/canvas/AppleMusicToken.kt declares `com.mochyy.mochymusic.canvas`",
+        "providers/canvas/src/main/kotlin/com/music/vivi/canvas/CanvasArtwork.kt declares `com.mochyy.mochymusic.canvas`",
+        "providers/canvas/src/main/kotlin/com/music/vivi/canvas/CanvasMatch.kt declares `com.mochyy.mochymusic.canvas`",
+        "providers/canvas/src/main/kotlin/com/music/vivi/canvas/MonochromeAlbumCanvas.kt declares `com.mochyy.mochymusic.canvas`",
+        "providers/canvas/src/main/kotlin/com/music/vivi/canvas/MonochromeApiCanvas.kt declares `com.mochyy.mochymusic.canvas`",
+        "providers/canvas/src/test/kotlin/com/music/vivi/canvas/MonochromeApiCanvasTest.kt declares `com.mochyy.mochymusic.canvas`",
+        "providers/betterlyrics/src/main/kotlin/com/music/vivi/betterlyrics/BetterLyrics.kt declares `com.mochyy.mochymusic.betterlyrics`",
+        "providers/betterlyrics/src/main/kotlin/com/music/vivi/betterlyrics/TTMLParser.kt declares `com.mochyy.mochymusic.betterlyrics`",
+        "providers/betterlyrics/src/main/kotlin/com/music/vivi/betterlyrics/models/Track.kt declares `com.mochyy.mochymusic.betterlyrics.models`",
+        "providers/innertube/src/main/kotlin/com/music/innertube/models/PlaylistDeleteBody.kt declares `com.music.innertube.models.body`"
+      ]
+    },
+    {
+      "level": "PASS",
+      "check": "kotlin",
+      "message": "no BOM, no tab indentation, no CRLF line endings, no empty files",
+      "evidence": []
+    },
+    {
+      "level": "PASS",
+      "check": "room",
+      "message": "all 23 entities and 3 views in @Database exist (several are declared inside a shared file, which is why a filename check lies)",
+      "evidence": []
+    },
+    {
+      "level": "PASS",
+      "check": "room",
+      "message": "AllMigrations and the MIGRATION_* definitions agree exactly (11 migrations)",
+      "evidence": []
+    },
+    {
+      "level": "FAIL",
+      "check": "room",
+      "message": "no upgrade path to schema v42 from 34 earlier schema versions. Room's fallbackToDestructiveMigration(dropAllTables=true) then deletes the entire library on upgrade, and TransferImport.hasMigrationPath() refuses those exports.",
+      "evidence": [
+        "versions with no path: 1..34 (34 total)",
+        "versions that do work: [35, 36, 37, 38, 39, 40, 41, 42]",
+        "migrations present: ['MIGRATION_1_2', 'MIGRATION_21_24', 'MIGRATION_22_24', 'MIGRATION_24_25', 'MIGRATION_35_36', 'MIGRATION_36_37', 'MIGRATION_37_38', 'MIGRATION_38_39', 'MIGRATION_39_40', 'MIGRATION_40_41', 'MIGRATION_41_42']",
+        "evidence: db/MusicDatabase.kt (AllMigrations, ~line 187) and importer/transfer/TransferImport.kt:259"
+      ]
+    },
+    {
+      "level": "WARN",
+      "check": "room",
+      "message": "exportSchema = false while ksp still sets room.schemaLocation, so no new schema JSON is written. app/schemas therefore stops at v34 although the DB is at v42 -- schema-diff tests and export provenance cannot see the live schema.",
+      "evidence": [
+        "exported versions present: 34 (max 34)",
+        "two namespace dirs: com.music.vivi.db (pre-rename) and com.mochyy.mochymusic.db"
+      ]
+    },
+    {
+      "level": "PASS",
+      "check": "tests",
+      "message": "all 27 unit-test files resolve every internal import; 27 test classes carrying 177 @Test methods",
+      "evidence": []
+    },
+    {
+      "level": "PASS",
+      "check": "module-deps",
+      "message": "all 6085 internal cross-module imports are backed by a declared project(\":\u2026\") dependency in the importing module",
+      "evidence": []
+    },
+    {
+      "level": "PASS",
+      "check": "ci",
+      "message": "all 1 distinct ./gradlew tasks used by 3 workflows match a real variant: assembleUniversalGmsDebug",
+      "evidence": []
+    },
+    {
+      "level": "PASS",
+      "check": "prereqs",
+      "message": "proguard-rules.pro and proguard-profileable.pro both present",
+      "evidence": []
+    },
+    {
+      "level": "PASS",
+      "check": "prereqs",
+      "message": "native build intact: app/src/main/cpp/CMakeLists.txt plus every source it lists",
+      "evidence": []
+    },
+    {
+      "level": "PASS",
+      "check": "prereqs",
+      "message": "./gradlew is executable and the wrapper jar + properties are present",
+      "evidence": []
+    },
+    {
+      "level": "PASS",
+      "check": "prereqs",
+      "message": "every keystore / proguard / cmake / wrapper path the build actually uses is present",
+      "evidence": []
+    },
+    {
+      "level": "INFO",
+      "check": "prereqs",
+      "message": "build prerequisite notes",
+      "evidence": [
+        "signingConfig \"persistentDebug\" points at the missing app/persistent-debug.keystore but no build type uses it, so it is inert -- a footgun if one ever does",
+        "signingConfig \"release\" points at the missing app/keystore/release.keystore but no build type uses it, so it is inert -- a footgun if one ever does",
+        "Gradle distribution required: https://services.gradle.org/distributions/gradle-9.3.1-bin.zip"
+      ]
+    },
+    {
+      "level": "FAIL",
+      "check": "prereqs",
+      "message": "build.sh uses BSD/macOS-only `sed -i ''` on 6 lines. GNU sed reads '' as the script and the following argument as a filename, so the documented `./build.sh --debug` path dies under `set -e` on Linux and on the CI runners.",
+      "evidence": [
+        "build.sh lines [138, 145, 153, 154, 155, 156]",
+        "GNU sed: `sed -i '' \"s/a/b/g\" file` -> script=\"\", then \"s/a/b/g\" and file are treated as input filenames",
+        "fix: `sed -i.bak \u2026 && rm *.bak`, or `perl -pi -e`, or branch on `uname`"
+      ]
+    },
+    {
+      "level": "PASS",
+      "check": "buildconfig",
+      "message": "all 13 BuildConfig fields read by Kotlin are defined in the build scripts",
+      "evidence": []
+    },
+    {
+      "level": "PASS",
+      "check": "json-docs",
+      "message": "all 45 JSON files parse cleanly (10 config/asset, 35 Room schema exports)",
+      "evidence": []
+    },
+    {
+      "level": "WARN",
+      "check": "json-docs",
+      "message": "7 docs/*.md paths referenced from code and config do not exist -- .gitignore excludes `docs/`, so upstream keeps them locally only and every fresh clone inherits dangling references.",
+      "evidence": [
+        "docs/notes/audio-output.md",
+        "docs/notes/cast.md",
+        "docs/notes/modules.md",
+        "docs/notes/performance.md",
+        "docs/notes/settings.md",
+        "docs/notes/update.md",
+        "docs/popup-sheet.skill.md"
+      ]
+    },
+    {
+      "level": "PASS",
+      "check": "secrets",
+      "message": "no AWS/GitHub/Slack/Stripe keys, PEM private keys, bearer literals or password assignments in any of the 1859 source, resource, config and script files",
+      "evidence": []
+    },
+    {
+      "level": "INFO",
+      "check": "secrets",
+      "message": "PoTokenWebView.kt embeds a YouTube *web-client* API key. This is not a leak: it is the public key YouTube's own browser player ships, it is quota-scoped to that client id, and every InnerTube implementation (ytmusic, ReVanced, ViMusic) carries the same constant. It cannot be moved to a secret because the app must work with no server and no user-supplied key.",
+      "evidence": [
+        "AIzaSyDyT5W0...oAnw at PoTokenWebView.kt:303 (GOOGLE_API_KEY)",
+        "REQUEST_KEY beside it is likewise YouTube's public attestation id"
+      ]
+    },
+    {
+      "level": "INFO",
+      "check": "secrets",
+      "message": "real credentials are injected at build time from local.properties or CI secrets and default to empty strings, so a clean checkout contains none",
+      "evidence": [
+        "LASTFM_API_KEY / LASTFM_SECRET",
+        "LIBREFM_API_KEY / LIBREFM_SECRET (MD5 stand-in derived from applicationId when unset)",
+        "DISCORD_CLIENT_ID (manifest placeholder falls back to mochy-discord-unset)"
+      ]
+    },
+    {
+      "level": "PASS",
+      "check": "flavors",
+      "message": "2 flavor dimensions (variant=[foss, fdroid, gms]; abi=[universal, arm64, armeabi, x86, x86_64]) x 4 build types = 60 buildable variants",
+      "evidence": [
+        "source sets present: debug, fdroid, foss, gms, main, test",
+        "fdroid explicitly reuses src/foss/kotlin + src/foss/res via sourceSets{}",
+        "gms-only deps are scoped with \"gmsImplementation\" so foss/fdroid stay Play-Services free"
+      ]
+    },
+    {
+      "level": "PASS",
+      "check": "app-icons",
+      "message": "the manifest's 50 launcher activity-alias entries are exactly the set AppIcons.kt builds: 14 presets + 3 families \u00d7 12 colours = 50",
+      "evidence": []
+    },
+    {
+      "level": "FAIL",
+      "check": "navigation",
+      "message": "navController.navigate() targets with no matching declared route -- tapping these throws IllegalArgumentException at runtime",
+      "evidence": [
+        "\"mood_and_genres\" navigated 1x from app/src/main/kotlin/com/mochyy/mochymusic/ui/screens/HomeScreen.kt:1679",
+        "\"new_release\" navigated 1x from app/src/main/kotlin/com/mochyy/mochymusic/ui/screens/ExploreScreen.kt:322"
+      ]
+    }
+  ]
+}
