@@ -36,6 +36,7 @@ class BrowserEngine private constructor(context: Context) {
     var external: ((String)->Unit)?=null
     private val sessions=mutableListOf<GeckoSession>()
     private val windows=mutableListOf<GeckoSession>()
+    private val history=mutableMapOf<GeckoSession,Boolean>()
     private var web: GeckoSession?=null
     var optionsLoaded by mutableStateOf(false)
     private val handler=Handler(Looper.getMainLooper())
@@ -91,7 +92,7 @@ class BrowserEngine private constructor(context: Context) {
     fun goBack():Boolean {
         if(fullScreen){current?.exitFullScreen();return true}
         if(auxiliary){closeAuxiliary();return true}
-        if(canBack){current?.goBack();return true}
+        if(history[current]==true){current?.goBack();return true}
         if(windows.isNotEmpty()){val last=windows.removeAt(windows.lastIndex);current?.close();current=last;return true}
         return false
     }
@@ -101,7 +102,7 @@ class BrowserEngine private constructor(context: Context) {
         s.settings.userAgentMode=if(desktop)GeckoSessionSettings.USER_AGENT_MODE_DESKTOP else GeckoSessionSettings.USER_AGENT_MODE_MOBILE
         s.promptDelegate=promptDelegate
         s.navigationDelegate=object:GeckoSession.NavigationDelegate {
-            override fun onCanGoBack(session:GeckoSession,value:Boolean){if(session===current)canBack=value}
+            override fun onCanGoBack(session:GeckoSession,value:Boolean){history[session]=value;if(session===current)canBack=value}
             override fun onLoadRequest(session:GeckoSession,request:GeckoSession.NavigationDelegate.LoadRequest):GeckoResult<AllowOrDeny>{
                 val uri=android.net.Uri.parse(request.uri)
                 return when(uri.scheme?.lowercase()){

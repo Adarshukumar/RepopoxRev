@@ -48,6 +48,7 @@ jobs:
           gradle testDebugUnitTest --console=plain 2>&1 | tee -a build.log
       - name: Verify APK structure and signature block
         run: |
+          python3 ci/verify_extension.py app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
           python3 ci/verify_apk.py app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
           SIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
           "$SIGNER" verify --verbose app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
@@ -82,7 +83,8 @@ jobs:
             cat build-manifest.log
             cat build-manifest.json
             tail -55 build.log
-            tail -50 screenshots/logcat-errors.txt
+            cat screenshots/extension-log.txt
+            tail -15 screenshots/logcat-errors.txt
             echo '```'
           } > report.md
           gh api -X POST "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments" -F body=@report.md

@@ -14,7 +14,7 @@ object Address {
         require('.' in host && !host.startsWith('.') && !host.endsWith('.')) { "Enter a complete website domain." }
         require(uri.port == -1 || uri.port in 1..65535) { "That port is not valid." }
         val ascii=IDN.toASCII(host.lowercase())
-        return URI("https",null,ascii,uri.port,uri.path.ifEmpty{"/"},uri.query,uri.fragment).toASCIIString()
+        return "https://" + ascii + (if(uri.port == -1) "" else ":${uri.port}") + uri.rawPath.ifEmpty { "/" } + (uri.rawQuery?.let { "?$it" } ?: "") + (uri.rawFragment?.let { "#$it" } ?: "")
     }
     fun host(url: String): String = try { URI(url).host ?: url } catch(_:Exception){url}
 }

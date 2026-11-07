@@ -21,6 +21,9 @@ android {
     kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_21) } }
     buildFeatures { compose = true; buildConfig = true }
     splits { abi { isEnable = true; reset(); include("arm64-v8a", "x86_64"); isUniversalApk = false } }
+    // AAPT's default underscore-directory exclusion strips WebExtension _locales.
+    // Preserve the upstream package byte-for-byte, including those directories.
+    androidResources { ignoreAssetsPattern = "!.git:!.svn:!*.scc:!CVS:!*~" }
     testOptions { animationsDisabled = true }
 }
 dependencies {

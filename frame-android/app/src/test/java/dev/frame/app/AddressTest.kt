@@ -6,6 +6,7 @@ class AddressTest {
     @Test fun trims(){assertEquals("https://youtube.com/",Address.normalize(" youtube.com "))}
     @Test fun lowercaseHost(){assertEquals("https://youtube.com/",Address.normalize("HTTPS://YOUTUBE.COM"))}
     @Test fun retainsPath(){assertEquals("https://example.com/a?q=x#b",Address.normalize("example.com/a?q=x#b"))}
+    @Test fun preservesEncodedSeparators(){assertEquals("https://example.com/a%2Fb?q=x%26z",Address.normalize("https://example.com/a%2Fb?q=x%26z"))}
     @Test fun retainsPort(){assertEquals("https://example.com:8443/",Address.normalize("example.com:8443"))}
     @Test(expected=IllegalArgumentException::class) fun refusesHttp(){Address.normalize("http://example.com")}
     @Test(expected=IllegalArgumentException::class) fun refusesJavascript(){Address.normalize("javascript://example.com/x")}

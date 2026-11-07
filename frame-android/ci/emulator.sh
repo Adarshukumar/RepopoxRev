@@ -7,5 +7,7 @@ gradle connectedDebugAndroidTest --console=plain 2>&1 | tee -a build.log
 status=${PIPESTATUS[0]}
 mkdir -p screenshots
 adb pull /sdcard/Download/. screenshots/
+adb logcat -d > screenshots/logcat-full.txt
+grep -Ei 'Gecko|extension|manifest|Addon|ubol' screenshots/logcat-full.txt | tail -100 > screenshots/extension-log.txt
 adb logcat -d -t 2000 '*:E' > screenshots/logcat-errors.txt
 exit "$status"
