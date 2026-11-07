@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  There is nothing worth extracting. The app stores only its own localStorage (four
+  booleans and the depth you last stopped at) inside the WebView data directory, and
+  that is not user content anyone would want to carry to a new phone.
+
+  Note the double hyphen this comment avoids: "- -" is not a legal sequence inside an
+  XML comment, and AAPT2 rejects the file outright rather than warning about it.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+    </device-transfer>
+</data-extraction-rules>

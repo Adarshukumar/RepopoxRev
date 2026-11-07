@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ABYSSAL</string>
+    <string name="app_description">An interactive descent through the five depth zones of the ocean, from the sunlit surface to the Challenger Deep at 10,935 metres. Works offline; collects nothing.</string>
+</resources>

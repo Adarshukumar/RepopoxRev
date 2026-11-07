@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- the same ramp the canvas paints: theme.js interpolates these exact stops -->
+    <color name="abyss_surface">#FF79DCE6</color>
+    <color name="abyss_twilight">#FF03253F</color>
+    <color name="abyss_deep">#FF00050A</color>
+    <color name="abyss_backdrop">#FF01080F</color>
+    <color name="abyss_lure">#FFCF6B</color>
+    <color name="abyss_glint">#FFBFEAFF</color>
+</resources>

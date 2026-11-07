@@ -1,0 +1,15 @@
+/*
+ * ABYSSAL for Android — root build
+ *
+ * The only plugin is the Android application plugin: no Kotlin plugin, no AndroidX.
+ * The app is one Activity wrapping a WebView, so everything it needs is in the
+ * framework. Every dependency this build does not declare is one fewer thing that
+ * can fail to resolve on a cold CI runner.
+ */
+plugins {
+    id 'com.android.application' version '8.5.2' apply false
+}
+
+tasks.register('clean', Delete) {
+    delete rootProject.layout.buildDirectory
+}

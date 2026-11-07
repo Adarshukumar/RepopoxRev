@@ -1,0 +1,60 @@
+/*
+ * ABYSSAL for Android — app module
+ *
+ * No `dependencies` block at all. The whole app is android.app.Activity plus
+ * android.webkit.WebView from the framework, so there is nothing to resolve, nothing
+ * to version-align, and no AndroidX/AGP compatibility matrix to get wrong.
+ *
+ * The web app is NOT duplicated into this path: CI copies ../../abyssal into
+ * src/main/assets/abyssal before building, so there is one copy of the descent and
+ * its physics rather than two that can drift apart.
+ */
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'dev.abyssal.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "dev.abyssal.app"
+        /* 26 rather than 24: adaptive launcher icons arrive at 26, so staying there
+           means the icon is pure XML with no legacy PNG mipmaps to ship. The
+           Chromium WebView on 7.x is also a poor host for a full-screen canvas. */
+        minSdk 26
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    buildTypes {
+        debug {
+            /* the artifact CI publishes; signed with the standard debug key, so it
+               installs and runs like any other APK */
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            /* no signingConfig, so a release build here would be unsigned. Build
+               debug unless you have a key of your own to point at. */
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    /* the web app ships as assets: nothing to compress away, and inflating them at
+       load time would only cost startup */
+    androidResources {
+        noCompress 'html', 'css', 'js'
+    }
+
+    lint {
+        abortOnError false
+        warningsAsErrors false
+    }
+}
