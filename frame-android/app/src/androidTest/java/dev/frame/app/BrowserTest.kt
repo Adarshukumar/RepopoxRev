@@ -22,10 +22,10 @@ class BrowserTest {
         val probe=ProbeServer(path)
         try {
             val engine=rule.activity.engine
-            rule.runOnUiThread{engine.saveHome("https://example.com/")}
+            val probeHome="http://127.0.0.1:${probe.port}/?phase=enabled"
+            rule.runOnUiThread{engine.saveHome(probeHome)}
             rule.waitUntil(120000){engine.ready||engine.installError.isNotEmpty()}
             Assert.assertTrue("Extension initialization: ${engine.installError}",engine.ready)
-            rule.runOnUiThread{engine.load("http://127.0.0.1:${probe.port}/?phase=enabled")}
             rule.waitUntil(60000){engine.title.startsWith("probe:")}
             Assert.assertEquals("probe:control=1;ad=0",engine.title)
             Assert.assertEquals("Blocked request must not reach server",0,probe.adHits.get())
@@ -52,10 +52,19 @@ class BrowserTest {
             rule.onNodeWithContentDescription("App controls").performClick()
             rule.onNodeWithText("Make it yours.").assertExists()
             screenshot("04-settings")
-            Assert.assertEquals("https://example.com/",engine.prefs.getString("home",null))
+            Assert.assertEquals(probeHome,engine.prefs.getString("home",null))
+            rule.runOnUiThread{rule.activity.onBackPressedDispatcher.onBackPressed();engine.saveHome("https://m.youtube.com/")}
+            rule.waitUntil(60000){engine.currentUrl.contains("youtube.com")&&!engine.loading || engine.pageError.isNotEmpty()}
+            Assert.assertTrue("YouTube main page: ${engine.pageError}",engine.pageError.isEmpty())
+            Assert.assertTrue(engine.currentUrl.contains("youtube.com"))
+            screenshot("05-youtube")
         }finally{probe.close()}
     }
-    @After fun finalScreenshot(){screenshot("99-final")}
+    @After fun finalScreenshot(){
+        val e=rule.activity.engine
+        android.util.Log.i("FrameTest","ready=${e.ready}; enabled=${e.enabled}; title=${e.title}; url=${e.currentUrl}; loading=${e.loading}; error=${e.pageError}; extensionError=${e.installError}")
+        screenshot("99-final")
+    }
     private fun screenshot(name:String){rule.waitForIdle();android.os.SystemClock.sleep(700);val inst=InstrumentationRegistry.getInstrumentation();val bmp=inst.uiAutomation.takeScreenshot();val f=File(inst.targetContext.getExternalFilesDir(null),"frame-$name.png");f.outputStream().use{bmp.compress(Bitmap.CompressFormat.PNG,100,it)};android.os.ParcelFileDescriptor.AutoCloseInputStream(inst.uiAutomation.executeShellCommand("cp ${f.absolutePath} /sdcard/Download/frame-$name.png")).use{it.readBytes()}}
 }
 private class ProbeServer(private val adPath:String){
