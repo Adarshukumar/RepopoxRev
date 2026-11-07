@@ -74,7 +74,13 @@ class BrowserEngine private constructor(context: Context) {
         if(changing)return
         changing=true
         val op=if(value)controller.enable(ext,WebExtensionController.EnableSource.USER)else controller.disable(ext,WebExtensionController.EnableSource.USER)
-        op.accept({e-> if(e!=null)attach(e);enabled=value;prefs.edit().putBoolean("blocking",value).apply();changing=false;done(true) },{e->changing=false;installError="Could not change extension state: $e";done(false)})
+        op.accept({e->
+            if(e!=null)attach(e)
+            // Gecko acknowledges enablement before an MV3 background has finished
+            // asynchronous ruleset registration. Keep the applying state during
+            // this startup grace period before the automatic page reload.
+            handler.postDelayed({enabled=value;prefs.edit().putBoolean("blocking",value).apply();changing=false;done(true)},if(value)2500L else 0L)
+        },{e->changing=false;installError="Could not change extension state: $e";done(false)})
     }
     fun saveHome(url:String){home=url;prefs.edit().putString("home",url).apply();if(ready)openHome()else install()}
     fun setAppearance(value:String){theme=value;prefs.edit().putString("theme",value).apply()}

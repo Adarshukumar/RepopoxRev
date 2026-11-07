@@ -37,3 +37,9 @@ upstream/
 *.xpi
 build-manifest.json
 screenshot-comment.md
+
+frame-screenshots.zip
+publish.log
+publication-error.md
+build-manifest.log
+app/src/main/assets/probe.json
