@@ -1,4 +1,4 @@
-# Frame 1.0.0 — your website, without the browser toolbar
+# Frame 1.0.0 Preview — your website, without the browser toolbar
 
 Native Android shell with Mozilla GeckoView and the **real, unmodified uBlock Origin Lite Firefox extension**. This is not Chromium and not a WebView filter imitation.
 
@@ -12,7 +12,9 @@ Download `frame-1.0.0-preview.apk` for **ARM64 Android 8+**. This is a debug-sig
 ## Verification and limits
 CI tests the genuine extension against a local HTTP fixture using an actual unmodified upstream blocking rule: normal requests load, the ad-pattern request is blocked when enabled, reaches the server when disabled, and is blocked again when re-enabled. The official extension dashboard must also load before publication. No fabricated blocking counter or replacement rules are used.
 
-This proves the tested filtering path, not that every ad on every site will disappear. YouTube changes frequently; DRM playback and some providers' embedded-browser sign-in restrictions remain outside Frame's control. Camera/microphone capture, download management and other full-browser features are not implemented in this preview.
+**YouTube compatibility is not verified.** An external YouTube smoke test stalled/crashed the CI emulator and is recorded separately, not counted as passing. Test on a physical phone before relying on playback or sign-in.
+
+This proves the controlled filtering path, not that every ad on every site will disappear. YouTube changes frequently; DRM playback and some providers' embedded-browser sign-in restrictions remain outside Frame's control. Camera/microphone capture, download management and other full-browser features are not implemented in this preview.
 
 ## Privacy and sources
 Frame has no analytics/backend. Website requests still go to their respective servers. The extension has website access needed to filter content; its settings and permissions are exposed. Acknowledge this during initial setup.

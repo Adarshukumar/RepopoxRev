@@ -42,7 +42,7 @@ The test checks:
 4. Re-enabling the extension blocks it again.
 5. The genuine `moz-extension:` options dashboard loads and its localized title resolves; native screenshots are reviewed for the visible filtering controls. The fixed Pixel 6 test uses a screenshot-reviewed touch fallback if Gecko virtual HTML nodes are not exposed to UiAutomator.
 6. Native settings and saved URL persistence work.
-7. A separate navigation smoke check opens the mobile YouTube home page; it does not prove video playback or the absence of every advertisement.
+7. An optional `publicYouTubePageSmoke` test exists separately. Attempts stalled/crashed the CI emulator; it is excluded from deterministic release gating and is **not verified**. The preview must be checked on a physical phone before relying on YouTube playback, sign-in or ad behavior.
 
 This is deliberately a controlled filtering test, not a claim that all YouTube advertising or every real-world site works. Screenshots and reports are retained by CI. Publication is gated on tests and APK verification.
 

@@ -50,6 +50,7 @@ class BrowserTest {
             rule.waitUntil(60000){engine.optionsLoaded&&engine.currentUrl.startsWith("moz-extension:")||engine.pageError.isNotEmpty()}
             Assert.assertTrue("Official extension dashboard must load: ${engine.pageError}",engine.optionsLoaded)
             Assert.assertTrue(engine.currentUrl.startsWith("moz-extension:"))
+            android.util.Log.i("FrameTest","PASS: enabled / disabled / re-enabled network blocking")
             val device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
             rule.waitUntil(30000){engine.title.contains("Dashboard",ignoreCase=true)}
             val filters=device.wait(Until.findObject(By.textContains("Filter lists")),3000)
@@ -64,19 +65,27 @@ class BrowserTest {
             }
             android.os.SystemClock.sleep(1800)
             screenshot("03b-ubol-filter-lists")
+            android.util.Log.i("FrameTest","Dashboard captured; returning to native controls")
             rule.onNodeWithContentDescription("Close extension settings").performClick()
             rule.onNodeWithContentDescription("App controls").performClick()
             rule.onNodeWithText("Make it yours.").assertExists()
             screenshot("04-settings")
             Assert.assertEquals(probeHome,engine.prefs.getString("home",null))
-            rule.runOnUiThread{rule.activity.onBackPressedDispatcher.onBackPressed();engine.saveHome("https://m.youtube.com/")}
-            rule.waitUntil(60000){engine.currentUrl.contains("youtube.com")&&engine.title.contains("YouTube",ignoreCase=true)&&!engine.loading || engine.pageError.isNotEmpty()}
-            Assert.assertTrue("YouTube main page: ${engine.pageError}",engine.pageError.isEmpty())
-            Assert.assertTrue(engine.currentUrl.contains("youtube.com"))
-            Assert.assertTrue("YouTube page title must resolve",engine.title.contains("YouTube",ignoreCase=true))
-            android.os.SystemClock.sleep(2500)
-            screenshot("05-youtube")
+            android.util.Log.i("FrameTest","PASS: all three blocking phases, official settings, native controls, and saved URL")
         }finally{probe.close()}
+    }
+    // External-site compatibility is deliberately separate from deterministic
+    // extension verification. This check previously stalled the CI emulator;
+    // it is NOT represented as passing in the preview release.
+    @Test fun publicYouTubePageSmoke(){
+        val engine=rule.activity.engine
+        rule.runOnUiThread{engine.saveHome("https://m.youtube.com/")}
+        rule.waitUntil(120000){engine.ready||engine.installError.isNotEmpty()}
+        Assert.assertTrue(engine.installError,engine.ready)
+        rule.waitUntil(60000){engine.currentUrl.contains("youtube.com")&&engine.title.contains("YouTube",ignoreCase=true)&&!engine.loading || engine.pageError.isNotEmpty()}
+        Assert.assertTrue(engine.pageError,engine.pageError.isEmpty())
+        Assert.assertTrue(engine.title.contains("YouTube",ignoreCase=true))
+        screenshot("05-youtube")
     }
     @After fun finalScreenshot(){
         val e=rule.activity.engine

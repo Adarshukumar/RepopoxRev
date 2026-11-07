@@ -6,4 +6,4 @@ git -C .. archive --format=tar.gz --output=frame-android/frame-source.tar.gz "$G
 git clone --depth 1 --branch 2026.1103.1743 --recurse-submodules --shallow-submodules https://github.com/uBlockOrigin/uBOL-home.git upstream/source
 tar --exclude=.git -czf ubOLite-corresponding-source.tar.gz -C upstream source
 zip -j frame-screenshots.zip screenshots/frame-*.png
-gh release create frame-v1.0.0 frame-1.0.0-preview.apk SHA256SUMS.txt build-manifest.json frame-source.tar.gz ubOLite-corresponding-source.tar.gz upstream/*.xpi frame-screenshots.zip --target "$GITHUB_SHA" --title 'Frame 1.0.0 — Website app with uBlock Origin Lite' --notes-file RELEASE.md
+gh release create frame-v1.0.0 frame-1.0.0-preview.apk SHA256SUMS.txt build-manifest.json frame-source.tar.gz ubOLite-corresponding-source.tar.gz upstream/*.xpi frame-screenshots.zip --target "$GITHUB_SHA" --prerelease --title 'Frame 1.0.0 Preview — Website app with uBlock Origin Lite' --notes-file RELEASE.md

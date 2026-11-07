@@ -35,6 +35,7 @@ class BrowserEngine private constructor(context: Context) {
         set(value) { field=value; sessions.forEach{it.promptDelegate=value} }
     var external: ((String)->Unit)?=null
     private val sessions=mutableListOf<GeckoSession>()
+    private val retired=mutableSetOf<GeckoSession>()
     private val windows=mutableListOf<GeckoSession>()
     private val history=mutableMapOf<GeckoSession,Boolean>()
     private var web: GeckoSession?=null
@@ -94,7 +95,7 @@ class BrowserEngine private constructor(context: Context) {
         if(url==null){pageError="The extension has not provided a settings page yet.";return}
         closeAuxiliary();val s=newSession();auxiliary=true;current=s;optionsLoaded=false;title="";currentUrl="";s.loadUri(url)
     }
-    fun closeAuxiliary(){if(auxiliary){current?.let{if(it!==web){it.close();sessions.remove(it)}};current=web;auxiliary=false};optionsLoaded=false}
+    fun closeAuxiliary(){if(auxiliary){current?.let{if(it!==web)retired.add(it)};current=web;auxiliary=false};optionsLoaded=false}
     fun goBack():Boolean {
         if(fullScreen){current?.exitFullScreen();return true}
         if(auxiliary){closeAuxiliary();return true}
@@ -136,7 +137,10 @@ class BrowserEngine private constructor(context: Context) {
         if(open)s.open(runtime);sessions.add(s)
         return s
     }
-    fun markActive(session:GeckoSession){controller.setTabActive(session,true)}
+    fun onViewDetached(session:GeckoSession?) {
+        if(session!=null && retired.remove(session)){session.close();sessions.remove(session);history.remove(session)}
+    }
+    fun markActive(session:GeckoSession){sessions.filter{it.isOpen}.forEach{controller.setTabActive(it,it===session)}}
     companion object {
         private var singleton:BrowserEngine?=null
         fun get(context:Context):BrowserEngine=singleton ?: BrowserEngine(context).also{singleton=it}
