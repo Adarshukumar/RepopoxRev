@@ -644,10 +644,12 @@ fun FrequencyBars(
                         Modifier.width(1.dp).height(16.dp).align(Alignment.Center)
                             .background(palette.line)
                     )
-                    val w = (kotlin.math.abs(zipf) * 15f).dp
+                    /* Dp is Comparable but kotlin.math.max has no overload for
+                       it, so the floor is applied with coerceAtLeast. */
+                    val w = (kotlin.math.abs(zipf) * 15f).dp.coerceAtLeast(0.5.dp)
                     Box(
                         Modifier
-                            .width(max(w, 0.5.dp))
+                            .width(w)
                             .height(3.dp)
                             .align(if (zipf >= 0) Alignment.CenterEnd else Alignment.CenterStart)
                             .clip(RoundedCornerShape(1.5.dp))
