@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      No <uses-permission> element appears anywhere in this file, and that is
+      the point rather than an omission. A text analysis app that sends text
+      somewhere is a different product with different obligations. Declaring
+      nothing makes "your text never leaves the device" a property of the
+      build that a reviewer can verify by reading this file, instead of a
+      claim in a privacy policy.
+
+      Note in particular the absence of android.permission.INTERNET: without
+      it the process cannot open a socket at all, so there is no exfiltration
+      path to disable at runtime and no cleartext-traffic setting to get
+      wrong.
+    -->
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Prism.Splash">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Prism.Splash"
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation|uiMode|density|fontScale"
+            android:launchMode="singleTop">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!--
+              Accept a shared block of text from any other app. The handler is
+              declarative: the text lands in the intent and the shell reads it,
+              so "Analyse this" from a browser or reader opens PRISM with the
+              document already loaded.
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

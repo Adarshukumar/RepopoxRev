@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Light shell. Parent is a platform theme: the app depends on neither
+         AppCompat nor the View-based Material Components library, because
+         Compose supplies every widget it draws. -->
+    <style name="Theme.Prism" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/paper_white</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <!-- Launch theme. androidx.core:core-splashscreen provides the parent and
+         hands off to Theme.Prism, which resolves to the night variant below
+         when the device is dark. -->
+    <style name="Theme.Prism.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/paper_white</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/prism_logo</item>
+        <item name="postSplashScreenTheme">@style/Theme.Prism</item>
+    </style>
+
+</resources>

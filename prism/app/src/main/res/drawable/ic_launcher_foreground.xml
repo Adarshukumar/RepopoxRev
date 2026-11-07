@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- incoming beam, striking the left face -->
+    <path
+        android:strokeColor="#EAF4FA"
+        android:strokeWidth="3.2"
+        android:strokeLineCap="round"
+        android:pathData="M21,59L45,52.5" />
+
+    <!-- the prism itself -->
+    <path
+        android:fillColor="#16222E"
+        android:strokeColor="#3FB6D4"
+        android:strokeWidth="3"
+        android:strokeLineJoin="round"
+        android:pathData="M54,27L79,76L29,76Z" />
+
+    <!-- refracted spectrum leaving the right face. Three beams because the
+         app resolves one input into several independent readings, which is
+         exactly what the six layers do. -->
+    <path
+        android:strokeColor="#F2A03D"
+        android:strokeWidth="3.2"
+        android:strokeLineCap="round"
+        android:pathData="M67,55L87,43" />
+    <path
+        android:strokeColor="#3FB6D4"
+        android:strokeWidth="3.2"
+        android:strokeLineCap="round"
+        android:pathData="M67,57.5L88,57.5" />
+    <path
+        android:strokeColor="#7C6BF0"
+        android:strokeWidth="3.2"
+        android:strokeLineCap="round"
+        android:pathData="M67,60L87,72" />
+
+</vector>

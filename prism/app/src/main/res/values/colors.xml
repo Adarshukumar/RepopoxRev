@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Window background shown for the single frame before Compose draws.
+         Matching it to the shell colour is what prevents a white flash on
+         launch; it is not a theme colour and nothing in Compose reads it. -->
+    <color name="ink_black">#FF05080C</color>
+    <color name="paper_white">#FFFBFCFD</color>
+    <color name="prism_accent">#FF3FB6D4</color>
+</resources>

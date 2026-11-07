@@ -1,0 +1,207 @@
+name: PRISM
+
+# Builds PRISM, the Kotlin/Compose text-analysis app under prism/.
+#
+# Two things about this file are deliberate and worth explaining, because both
+# look like over-engineering until you know why they are there.
+#
+# 1. Unit tests run before the APK is assembled. The engine is pure Kotlin with
+#    no android.* import, so its arithmetic is checkable on a JVM with no
+#    emulator. If a formula is wrong there is no point producing an artifact
+#    that packages the wrong formula, and failing early keeps the log short
+#    enough to read.
+#
+# 2. On failure the job POSTs the tail of the build log back into the
+#    repository as a commit comment. GitHub Actions stores logs on
+#    results-receiver.actions.githubusercontent.com, which is not reachable
+#    from every environment that needs to read them; api.github.com is. This
+#    makes the failure text retrievable through a channel that works, instead
+#    of leaving a red X with no way to find out what it said.
+
+on:
+  push:
+    branches: [ arena/c4a5f7e4-repopoxrev, main ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: prism-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Test and build APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    defaults:
+      run:
+        working-directory: prism
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      # No gradle/wrapper jar is committed to this repository, so Gradle is
+      # provisioned by the action rather than invoked through ./gradlew. The
+      # version matches the one the vendored Mochy-Music project pins, which is
+      # a known-good pairing with this AGP and Kotlin release.
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.3.1'
+
+      - name: Show toolchain
+        shell: bash
+        run: |
+          set -o pipefail
+          {
+            echo "== java =="
+            java -version 2>&1
+            echo "== gradle =="
+            gradle --version 2>&1
+          } | tee build.log
+
+      - name: Unit tests (JVM, no emulator)
+        shell: bash
+        run: |
+          set -o pipefail
+          gradle testDebugUnitTest --stacktrace --no-daemon 2>&1 | tee -a build.log
+
+      - name: Assemble debug APK
+        shell: bash
+        run: |
+          set -o pipefail
+          gradle assembleDebug --stacktrace --no-daemon 2>&1 | tee -a build.log
+
+      - name: Summarise unit test results
+        shell: bash
+        if: always()
+        run: |
+          {
+            echo "== unit test suites =="
+            find app/build/test-results -name 'TEST-*.xml' 2>/dev/null | sort | while read -r f; do
+              head -c 4000 "$f" | tr '>' '>\n' | grep -o 'tests="[0-9]*"[^>]*' | head -1 | sed "s|^|$(basename "$f"): |"
+            done
+          } | tee -a build.log
+
+      - name: Verify the APK
+        shell: bash
+        run: |
+          set -o pipefail
+          python3 ci/verify_apk.py app/build/outputs/apk/debug/app-debug.apk 2>&1 | tee -a build.log
+
+      - name: Report failure back into the repository
+        shell: bash
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "### PRISM build failed"
+            echo
+            echo "Commit \`${GITHUB_SHA}\` · run ${GITHUB_RUN_ID} · job \`${GITHUB_JOB}\`"
+            echo
+            echo "<details><summary>unit test summary</summary>"
+            echo
+            echo '```'
+            find app/build/test-results -name 'TEST-*.xml' 2>/dev/null | sort | while read -r f; do
+              head -c 4000 "$f" | tr '>' '>\n' | grep -o 'testsuite name="[^"]*" tests="[0-9]*"[^>]*' | head -1 || echo "$(basename "$f"): (no summary)"
+            done
+            echo '```'
+            echo
+            echo "</details>"
+            echo
+            echo "<details><summary>last 220 lines of build log</summary>"
+            echo
+            echo '```'
+            tail -n 220 build.log 2>/dev/null || echo "(no build log was produced)"
+            echo '```'
+            echo
+            echo "</details>"
+          } > failure-report.md
+
+          gh api -X POST \
+            "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/comments" \
+            -F body=@failure-report.md \
+            || echo "::warning::could not post the failure comment"
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prism-build-log
+          path: prism/build.log
+          if-no-files-found: ignore
+          retention-days: 14
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: prism-debug-apk
+          path: prism/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      # Releases are cut from tags only. A branch push proves the build is
+      # green; a tag says "ship this one".
+      - name: Publish release
+        shell: bash
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -o pipefail
+          VERSION="${GITHUB_REF_NAME#v}"
+          APK="prism-${VERSION}-debug.apk"
+          cp app/build/outputs/apk/debug/app-debug.apk "$APK"
+          sha256sum "$APK" | tee -a build.log
+
+          cat > notes.md <<NOTES
+          ## PRISM ${VERSION}
+
+          A deep text-analysis instrument for Android, written in Kotlin with Jetpack Compose.
+
+          Paste or share any text and PRISM resolves it into six layers of measurement: surface
+          counts, six published readability formulas, four lexical-richness statistics, sentence
+          length distribution, weighted sentiment with an emotional arc, and word frequency
+          scored against Zipf's law. The figures are then summarised in prose that is derived
+          from the numbers rather than written around them.
+
+          **Offline by construction.** The manifest declares no permissions at all — not even
+          INTERNET — so analysis happening on the device is a property of the build, not a
+          promise in a privacy policy.
+
+          ### Install
+
+          1. Download \`prism-${VERSION}-debug.apk\` below.
+          2. Open it and allow installation from unknown sources when prompted.
+
+          This is a debug build signed with the Android debug key. It installs and runs
+          normally; it is simply not signed with a release key.
+
+          ### What was verified
+
+          Every build runs the engine's JVM unit test suite before assembling, so the
+          arithmetic behind each figure is checked on the same run that produced this
+          artifact. The formulas are the published ones, and the syllable counter, the
+          tokenizer's sentence boundaries and the richness statistics are all pinned by
+          hand-computed assertions.
+          NOTES
+
+          # Strip the heredoc's own indentation.
+          sed -i 's/^          //' notes.md
+
+          gh release create "${GITHUB_REF_NAME}" "$APK" \
+            --title "PRISM ${VERSION}" \
+            --notes-file notes.md \
+            || gh release upload "${GITHUB_REF_NAME}" "$APK" --clobber
