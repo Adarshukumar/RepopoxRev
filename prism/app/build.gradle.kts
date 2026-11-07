@@ -1,8 +1,11 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
+    /* No org.jetbrains.kotlin.android here. AGP 9 provides Kotlin support
+       itself and rejects the standalone plugin outright, so applying it is a
+       configuration error rather than a redundancy. The Compose compiler
+       plugin is still separate and still required. */
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
 }
 
@@ -19,7 +22,6 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
-        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
@@ -43,8 +45,17 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    /* Under AGP 9 the Kotlin configuration lives inside the android block,
+       not in a top-level kotlin { } extension — there is no standalone Kotlin
+       plugin applied to provide one. */
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_21)
+        }
     }
 
     buildFeatures {
@@ -53,21 +64,12 @@ android {
         buildConfig = false
     }
 
-    testOptions {
-        unitTests.isReturnDefaultValues = true
-    }
-
     lint {
         abortOnError = false
         warningsAsErrors = false
     }
 }
 
-kotlin {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
-    }
-}
 
 dependencies {
     /* Compose only. No Hilt, no Room, no navigation library, no network stack: the

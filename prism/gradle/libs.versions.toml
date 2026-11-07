@@ -29,6 +29,8 @@ core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = 
 junit = { module = "junit:junit", version.ref = "junit" }
 
 [plugins]
+# kotlin.android is deliberately absent: AGP 9 has built-in Kotlin support and
+# rejects the standalone plugin. The kotlin version above still drives the
+# Compose compiler plugin, which is published alongside it.
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
