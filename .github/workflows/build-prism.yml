@@ -132,10 +132,20 @@ jobs:
           set +o pipefail
 
           if [ -f build.log ]; then
-            LOG="$(tail -n 240 build.log)"
+            LOG="$(tail -n 120 build.log)"
           else
             LOG="(no build log was produced)"
           fi
+
+          # Kotlin and AAPT2 diagnostics are printed before Gradle's "What went
+          # wrong" summary, so a plain tail of a --stacktrace build misses them
+          # entirely and shows only the exception that reports the failure.
+          # Extracting them by pattern is what makes this comment actionable.
+          KERR="$(grep -E '^e: |^error: |^ERROR: |AAPT: error' build.log 2>/dev/null | head -n 80)"
+          if [ -z "$KERR" ]; then
+            KERR="$(grep -E 'FAILURE:|What went wrong|Could not|Unresolved reference|cannot find symbol' build.log 2>/dev/null | head -n 40)"
+          fi
+          [ -z "$KERR" ] && KERR="(no compiler diagnostics matched; see the log tail)"
 
           if [ -d app/build/test-results ]; then
             TESTS="$(grep -rho 'testsuite name="[^"]*" tests="[0-9]*" skipped="[0-9]*" failures="[0-9]*" errors="[0-9]*"' app/build/test-results 2>/dev/null | sort)"
@@ -150,8 +160,9 @@ jobs:
             printf 'The red step above identifies the phase: *Configure* means the Gradle\n'
             printf 'scripts, *Compile* means Kotlin or resources, *Run unit tests* means the\n'
             printf 'engine arithmetic.\n\n'
+            printf '#### compiler diagnostics\n\n```\n%s\n```\n\n' "$KERR"
             printf '#### unit test suites\n\n```\n%s\n```\n\n' "$TESTS"
-            printf '#### last 240 lines of build log\n\n```\n%s\n```\n' "$LOG"
+            printf '#### last 120 lines of build log\n\n```\n%s\n```\n' "$LOG"
           } > failure-report.md
 
           gh api -X POST \
