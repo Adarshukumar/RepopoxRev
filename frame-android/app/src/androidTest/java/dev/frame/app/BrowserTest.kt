@@ -70,9 +70,11 @@ class BrowserTest {
             screenshot("04-settings")
             Assert.assertEquals(probeHome,engine.prefs.getString("home",null))
             rule.runOnUiThread{rule.activity.onBackPressedDispatcher.onBackPressed();engine.saveHome("https://m.youtube.com/")}
-            rule.waitUntil(60000){engine.currentUrl.contains("youtube.com")&&!engine.loading || engine.pageError.isNotEmpty()}
+            rule.waitUntil(60000){engine.currentUrl.contains("youtube.com")&&engine.title.contains("YouTube",ignoreCase=true)&&!engine.loading || engine.pageError.isNotEmpty()}
             Assert.assertTrue("YouTube main page: ${engine.pageError}",engine.pageError.isEmpty())
             Assert.assertTrue(engine.currentUrl.contains("youtube.com"))
+            Assert.assertTrue("YouTube page title must resolve",engine.title.contains("YouTube",ignoreCase=true))
+            android.os.SystemClock.sleep(2500)
             screenshot("05-youtube")
         }finally{probe.close()}
     }
