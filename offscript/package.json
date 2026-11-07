@@ -1,0 +1,27 @@
+{
+  "name": "offscript",
+  "version": "1.0.0",
+  "description": "Offscript \u2014 a responsive, image-first social frontend",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "test": "node tests/ui.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fontsource/dm-sans": "^5.3.0",
+    "@fontsource/manrope": "^5.3.0",
+    "lucide-react": "^1.70.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "vite": "^8.3.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.0",
+    "@sparticuz/chromium": "^153.0.0"
+  },
+  "type": "module"
+}

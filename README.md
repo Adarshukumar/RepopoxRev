@@ -1,5 +1,9 @@
 # RepopoxRev
 
+## New: Offscript social frontend
+
+See [`offscript/`](offscript/README.md) for the responsive social-media UI. Run `cd offscript && npm ci && npm run dev`. This is a standalone frontend demo, not a PRISM update or Android wrapper.
+
 ## PRISM — the app in this repository
 
 **[PRISM](prism/)** is a deep text-analysis instrument for Android, written in Kotlin with Jetpack

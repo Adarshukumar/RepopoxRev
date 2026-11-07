@@ -1,0 +1,36 @@
+# Versions copied from the vendored Mochy-Music project in this repository, because
+# that project builds these exact artifacts together in CI. Picking a known-good set
+# matters more than picking a fashionable one: this project is authored somewhere with
+# no JDK and no Android SDK, so nothing here can be compiled locally to check.
+[versions]
+androidGradlePlugin = "9.0.0"
+kotlin = "2.3.10"
+compose = "1.10.2"
+material3 = "1.5.0-alpha18"
+lifecycle = "2.10.0"
+activity = "1.12.3"
+coreSplashscreen = "1.2.0"
+junit = "4.13.2"
+
+[libraries]
+compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
+compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
+compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
+compose-ui-graphics = { module = "androidx.compose.ui:ui-graphics", version.ref = "compose" }
+compose-ui-text = { module = "androidx.compose.ui:ui-text", version.ref = "compose" }
+compose-animation = { module = "androidx.compose.animation:animation", version.ref = "compose" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
+material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
+activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activity" }
+lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
+lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
+junit = { module = "junit:junit", version.ref = "junit" }
+
+[plugins]
+# kotlin.android is deliberately absent: AGP 9 has built-in Kotlin support and
+# rejects the standalone plugin. The kotlin version above still drives the
+# Compose compiler plugin, which is published alongside it.
+android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
