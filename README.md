@@ -1,5 +1,9 @@
 # RepopoxRev
 
+## Frame — website-as-an-app with uBlock Origin Lite
+
+See [`frame-android/`](frame-android/README.md) for the native Android shell with GeckoView, an unmodified uBO Lite package, its real settings dashboard, and an enabled/disabled network-blocking integration test. This is separate from Offscript and PRISM.
+
 ## New: Offscript social app
 
 See [`offscript/`](offscript/README.md) for the responsive social-media UI. Run `cd offscript && npm ci && npm run dev`. The native Android implementation is in [`offscript-android/`](offscript-android/README.md), with its own APK build, offline persistence and emulator tests. Neither version is a PRISM update or an Android WebView wrapper.
