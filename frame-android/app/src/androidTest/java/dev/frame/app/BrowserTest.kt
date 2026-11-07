@@ -46,8 +46,8 @@ class BrowserTest {
             rule.waitUntil(60000){engine.title.startsWith("probe:reenabled:")}
             Assert.assertEquals("probe:reenabled:control=1;ad=0",engine.title)
             screenshot("02-verified-filtering")
-            rule.runOnUiThread{engine.openOptions()}
-            rule.waitUntil(60000){engine.optionsLoaded||engine.pageError.isNotEmpty()}
+            rule.runOnUiThread{engine.runtime.settings.setForceEnableAccessibility(true);engine.openOptions()}
+            rule.waitUntil(60000){engine.optionsLoaded&&engine.currentUrl.startsWith("moz-extension:")||engine.pageError.isNotEmpty()}
             Assert.assertTrue("Official extension dashboard must load: ${engine.pageError}",engine.optionsLoaded)
             Assert.assertTrue(engine.currentUrl.startsWith("moz-extension:"))
             val device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())

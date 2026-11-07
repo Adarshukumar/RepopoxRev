@@ -92,7 +92,7 @@ class BrowserEngine private constructor(context: Context) {
     fun openOptions(){
         val url=extension?.metaData?.optionsPageUrl
         if(url==null){pageError="The extension has not provided a settings page yet.";return}
-        closeAuxiliary();val s=newSession();auxiliary=true;current=s;optionsLoaded=false;s.loadUri(url)
+        closeAuxiliary();val s=newSession();auxiliary=true;current=s;optionsLoaded=false;title="";currentUrl="";s.loadUri(url)
     }
     fun closeAuxiliary(){if(auxiliary){current?.let{if(it!==web){it.close();sessions.remove(it)}};current=web;auxiliary=false};optionsLoaded=false}
     fun goBack():Boolean {
@@ -108,6 +108,7 @@ class BrowserEngine private constructor(context: Context) {
         s.settings.userAgentMode=if(desktop)GeckoSessionSettings.USER_AGENT_MODE_DESKTOP else GeckoSessionSettings.USER_AGENT_MODE_MOBILE
         s.promptDelegate=promptDelegate
         s.navigationDelegate=object:GeckoSession.NavigationDelegate {
+            override fun onLocationChange(session:GeckoSession,url:String?,perms:MutableList<GeckoSession.PermissionDelegate.ContentPermission>,hasUserGesture:Boolean){if(session===current && url!=null)currentUrl=url}
             override fun onCanGoBack(session:GeckoSession,value:Boolean){history[session]=value;if(session===current)canBack=value}
             override fun onLoadRequest(session:GeckoSession,request:GeckoSession.NavigationDelegate.LoadRequest):GeckoResult<AllowOrDeny>{
                 val uri=android.net.Uri.parse(request.uri)
@@ -125,7 +126,7 @@ class BrowserEngine private constructor(context: Context) {
         }
         s.progressDelegate=object:GeckoSession.ProgressDelegate {
             override fun onPageStart(session:GeckoSession,url:String){if(session===current){currentUrl=url;loading=true;pageError=""}}
-            override fun onPageStop(session:GeckoSession,success:Boolean){if(session===current){loading=false;if(auxiliary&&success)optionsLoaded=true}}
+            override fun onPageStop(session:GeckoSession,success:Boolean){if(session===current){loading=false;if(auxiliary&&success&&currentUrl.startsWith("moz-extension:"))optionsLoaded=true}}
         }
         s.contentDelegate=object:GeckoSession.ContentDelegate {
             override fun onTitleChange(session:GeckoSession,value:String?){if(session===current)title=value?:""}
