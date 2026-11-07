@@ -46,6 +46,7 @@ TITLE_PREFIX = "repopox-cmd:"
 CONFIG_DIR = Path(os.environ.get("USERPROFILE") or Path.home()) / ".repopox"
 CONFIG_PATH = CONFIG_DIR / "agent.json"
 SEEN_PATH = CONFIG_DIR / "seen.json"
+REPO_SECRET_FILE = Path(__file__).resolve().parent / "relay.secret"
 
 DEFAULTS = {
     "repo": "Adarshukumar/RepopoxRev",
@@ -322,7 +323,13 @@ def setup():
         log("that doesn't look like owner/repo - aborting")
         sys.exit(1)
     token = getpass.getpass("GitHub token (hidden): ").strip()
-    secret = getpass.getpass("relay secret (hidden): ").strip()
+    # Prefer a relay.secret file committed to this (private) repo; fall back to typing.
+    secret = ""
+    if REPO_SECRET_FILE.exists():
+        secret = REPO_SECRET_FILE.read_text(encoding="utf-8").strip()
+        log("relay secret auto-loaded from local-agent\\relay.secret")
+    if not secret:
+        secret = getpass.getpass("relay secret (hidden): ").strip()
     workdir = input("default workdir [%s]: " % (cfg.get("workdir") or str(Path.home()))).strip() \
         or str(Path.home())
     if not token or not secret:

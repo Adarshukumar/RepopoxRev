@@ -10,9 +10,9 @@ desktop to the Arena agent (me) through GitHub.
 ```
 
 - **No pip installs.** Uses only Python's standard library (3.8+).
-- **Secure:** this repo is public, so the agent **only runs commands that are
-  correctly signed** with your secret (HMAC-SHA256). Random people can open
-  issues, but without your secret their commands are rejected and closed.
+- **Secure:** every command is **signed** with your secret (HMAC-SHA256).
+  The agent only runs correctly signed commands — anything else is rejected
+  and closed. Keep this repo **private** (it should be).
 - **Full-auto:** anything that passes the signature check runs immediately.
 
 ---
