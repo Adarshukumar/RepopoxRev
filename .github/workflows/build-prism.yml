@@ -2,21 +2,26 @@ name: PRISM
 
 # Builds PRISM, the Kotlin/Compose text-analysis app under prism/.
 #
-# Two things about this file are deliberate and worth explaining, because both
-# look like over-engineering until you know why they are there.
+# Three things about this file are deliberate, and all three exist because the
+# author cannot compile this project locally: there is no JDK, no Android SDK
+# and no route to the Maven repositories in the environment it is written in.
+# CI is the only compiler available, so it has to be instrumented to report.
 #
-# 1. Unit tests run before the APK is assembled. The engine is pure Kotlin with
-#    no android.* import, so its arithmetic is checkable on a JVM with no
-#    emulator. If a formula is wrong there is no point producing an artifact
-#    that packages the wrong formula, and failing early keeps the log short
-#    enough to read.
+# 1. Each Gradle phase is its own step. Which step turns red is itself the
+#    diagnosis: configuration failure means the build scripts are wrong,
+#    assemble failure means Kotlin or resources are wrong, test failure means
+#    the arithmetic is wrong. That distinction is visible in the job summary
+#    without reading a single log line.
 #
-# 2. On failure the job POSTs the tail of the build log back into the
-#    repository as a commit comment. GitHub Actions stores logs on
+# 2. On failure the job POSTs the build log tail back into the repository as a
+#    commit comment. Actions stores logs on
 #    results-receiver.actions.githubusercontent.com, which is not reachable
-#    from every environment that needs to read them; api.github.com is. This
-#    makes the failure text retrievable through a channel that works, instead
-#    of leaving a red X with no way to find out what it said.
+#    from every environment that needs them; api.github.com is. This step runs
+#    with errexit and pipefail disabled and always exits 0, because a
+#    diagnostic that can itself fail the job is worse than no diagnostic.
+#
+# 3. Tests run before the artifact is published, so a wrong formula can never
+#    reach a release.
 
 on:
   push:
@@ -46,15 +51,15 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
 
       # No gradle/wrapper jar is committed to this repository, so Gradle is
       # provisioned by the action rather than invoked through ./gradlew. The
-      # version matches the one the vendored Mochy-Music project pins, which is
-      # a known-good pairing with this AGP and Kotlin release.
+      # version matches what the vendored Mochy-Music project pins, a pairing
+      # known to work with this AGP and Kotlin release.
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
@@ -71,28 +76,45 @@ jobs:
             gradle --version 2>&1
           } | tee build.log
 
-      - name: Unit tests (JVM, no emulator)
+      # Configuring the build touches settings.gradle.kts, both build scripts
+      # and the version catalog, but compiles nothing. Splitting it out means a
+      # red mark here points at the build scripts rather than at Kotlin.
+      - name: Configure project
         shell: bash
         run: |
           set -o pipefail
-          gradle testDebugUnitTest --stacktrace --no-daemon 2>&1 | tee -a build.log
+          gradle projects --console=plain --stacktrace 2>&1 | tee -a build.log
 
-      - name: Assemble debug APK
+      - name: Compile Kotlin and resources
         shell: bash
         run: |
           set -o pipefail
-          gradle assembleDebug --stacktrace --no-daemon 2>&1 | tee -a build.log
+          gradle assembleDebug --console=plain --stacktrace 2>&1 | tee -a build.log
 
+      - name: Run unit tests (JVM, no emulator)
+        shell: bash
+        run: |
+          set -o pipefail
+          gradle testDebugUnitTest --console=plain --stacktrace 2>&1 | tee -a build.log
+
+      # Both of these run with errexit and pipefail off. `find` on a directory
+      # that was never created returns 1, and under the `shell: bash` default
+      # of `bash -eo pipefail` that single non-zero status is enough to abort
+      # the step before the diagnostic it was gathering gets published.
       - name: Summarise unit test results
         shell: bash
         if: always()
         run: |
-          {
-            echo "== unit test suites =="
-            find app/build/test-results -name 'TEST-*.xml' 2>/dev/null | sort | while read -r f; do
-              head -c 4000 "$f" | tr '>' '>\n' | grep -o 'tests="[0-9]*"[^>]*' | head -1 | sed "s|^|$(basename "$f"): |"
-            done
-          } | tee -a build.log
+          set +e
+          set +o pipefail
+          echo "== unit test suites =="
+          if [ -d app/build/test-results ]; then
+            grep -rho 'testsuite name="[^"]*" tests="[0-9]*" skipped="[0-9]*" failures="[0-9]*" errors="[0-9]*"' \
+              app/build/test-results 2>/dev/null | sort
+          else
+            echo "(no test-results directory; compilation did not reach the test phase)"
+          fi
+          exit 0
 
       - name: Verify the APK
         shell: bash
@@ -106,34 +128,40 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          set +e
+          set +o pipefail
+
+          if [ -f build.log ]; then
+            LOG="$(tail -n 240 build.log)"
+          else
+            LOG="(no build log was produced)"
+          fi
+
+          if [ -d app/build/test-results ]; then
+            TESTS="$(grep -rho 'testsuite name="[^"]*" tests="[0-9]*" skipped="[0-9]*" failures="[0-9]*" errors="[0-9]*"' app/build/test-results 2>/dev/null | sort)"
+            [ -z "$TESTS" ] && TESTS="(test result files exist but contain no summary line)"
+          else
+            TESTS="(no test-results directory)"
+          fi
+
           {
-            echo "### PRISM build failed"
-            echo
-            echo "Commit \`${GITHUB_SHA}\` · run ${GITHUB_RUN_ID} · job \`${GITHUB_JOB}\`"
-            echo
-            echo "<details><summary>unit test summary</summary>"
-            echo
-            echo '```'
-            find app/build/test-results -name 'TEST-*.xml' 2>/dev/null | sort | while read -r f; do
-              head -c 4000 "$f" | tr '>' '>\n' | grep -o 'testsuite name="[^"]*" tests="[0-9]*"[^>]*' | head -1 || echo "$(basename "$f"): (no summary)"
-            done
-            echo '```'
-            echo
-            echo "</details>"
-            echo
-            echo "<details><summary>last 220 lines of build log</summary>"
-            echo
-            echo '```'
-            tail -n 220 build.log 2>/dev/null || echo "(no build log was produced)"
-            echo '```'
-            echo
-            echo "</details>"
+            printf '### PRISM build failed\n\n'
+            printf 'Commit `%s` · run %s · job `%s`\n\n' "$GITHUB_SHA" "$GITHUB_RUN_ID" "$GITHUB_JOB"
+            printf 'The red step above identifies the phase: *Configure* means the Gradle\n'
+            printf 'scripts, *Compile* means Kotlin or resources, *Run unit tests* means the\n'
+            printf 'engine arithmetic.\n\n'
+            printf '#### unit test suites\n\n```\n%s\n```\n\n' "$TESTS"
+            printf '#### last 240 lines of build log\n\n```\n%s\n```\n' "$LOG"
           } > failure-report.md
 
           gh api -X POST \
             "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/comments" \
             -F body=@failure-report.md \
             || echo "::warning::could not post the failure comment"
+
+          # Always green: a diagnostic step that can fail the job obscures the
+          # failure it exists to explain.
+          exit 0
 
       - name: Upload build log
         if: always()
@@ -174,11 +202,11 @@ jobs:
           Paste or share any text and PRISM resolves it into six layers of measurement: surface
           counts, six published readability formulas, four lexical-richness statistics, sentence
           length distribution, weighted sentiment with an emotional arc, and word frequency
-          scored against Zipf's law. The figures are then summarised in prose that is derived
-          from the numbers rather than written around them.
+          scored against Zipf's law. The figures are then summarised in prose derived from the
+          numbers rather than written around them.
 
-          **Offline by construction.** The manifest declares no permissions at all — not even
-          INTERNET — so analysis happening on the device is a property of the build, not a
+          **Offline by construction.** The manifest declares no permissions at all, not even
+          INTERNET, so analysis staying on the device is a property of the build rather than a
           promise in a privacy policy.
 
           ### Install
@@ -191,11 +219,11 @@ jobs:
 
           ### What was verified
 
-          Every build runs the engine's JVM unit test suite before assembling, so the
-          arithmetic behind each figure is checked on the same run that produced this
-          artifact. The formulas are the published ones, and the syllable counter, the
-          tokenizer's sentence boundaries and the richness statistics are all pinned by
-          hand-computed assertions.
+          The engine is pure Kotlin with no android.* import, so its arithmetic is checked by
+          JVM unit tests that run in the same job that produced this artifact, before it is
+          published. The formulas are the published ones; the syllable counter, the tokenizer's
+          sentence boundaries, every readability score and the interpretation prose are all
+          pinned by hand-computed assertions.
           NOTES
 
           # Strip the heredoc's own indentation.
