@@ -58,11 +58,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           working-directory: offscript-android
-          script: |
-            set -o pipefail
-            gradle connectedDebugAndroidTest --console=plain 2>&1 | tee -a build.log
-            mkdir -p screenshots
-            adb pull /sdcard/Android/data/dev.offscript.social/files/. screenshots/
+          script: bash ci/emulator.sh
       - name: Report errors and test results
         if: always()
         env:
@@ -75,11 +71,19 @@ jobs:
             echo '```'
             grep -E '^e: |^error: |^ERROR: |FAIL|failed|tests completed|BUILD SUCCESSFUL|BUILD FAILED' build.log | tail -65
             find app/build -name '*.xml' -path '*test-results*' -exec grep -h '<testsuite ' {} \; | head -15
+            find app/build/outputs/androidTest-results -name '*.xml' -exec head -c 9000 {} \;
             tail -55 build.log
             echo '```'
           } > report.md
           gh api -X POST "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments" -F body=@report.md
           exit 0
+      - name: Post native screenshot previews
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -m pip install --quiet Pillow
+          python3 ci/screenshots.py
       - name: Upload APK and test evidence
         if: always()
         uses: actions/upload-artifact@v4

@@ -19,6 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
@@ -84,7 +86,7 @@ import kotlinx.coroutines.launch
         if(p.comments.isEmpty()) Txt("Be the first to add a little kindness.",13,C.muted)
         LazyColumn(Modifier.weight(1f,fill=false).heightIn(max=380.dp),state=list,verticalArrangement=Arrangement.spacedBy(16.dp)) { itemsIndexed(p.comments) { _,comment -> Row(horizontalArrangement=Arrangement.spacedBy(11.dp)) { Box(Modifier.size(32.dp).clip(CircleShape).background(C.soft),contentAlignment=Alignment.Center) { Txt(comment.author.take(1),12) };Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(4.dp)) { Txt(comment.author,11,weight=FontWeight.SemiBold);Txt(comment.body,13) } } } }
         HorizontalDivider(color=C.line)
-        Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(6.dp)) { OutlinedTextField(text,{ text=it.take(500) },Modifier.weight(1f),placeholder={ Txt("Add a little kindness…",12,C.muted) },shape=RoundedCornerShape(15.dp),maxLines=4);IconButton({ if(text.isNotBlank()){send(text);text=""} },enabled=text.isNotBlank()) { Glyph("send",if(text.isNotBlank())Orange else C.muted,Modifier.size(23.dp)) } }
+        Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(6.dp)) { OutlinedTextField(text,{ text=it.take(500) },Modifier.weight(1f),placeholder={ Txt("Add a little kindness…",12,C.muted) },shape=RoundedCornerShape(15.dp),maxLines=4);IconButton({ if(text.isNotBlank()){send(text);text=""} },modifier=Modifier.semantics { contentDescription = "Send comment" },enabled=text.isNotBlank()) { Glyph("send",if(text.isNotBlank())Orange else C.muted,Modifier.size(23.dp)) } }
         Txt("Comments are saved to this device.",10,C.muted)
     }
 }
@@ -116,7 +118,7 @@ import kotlinx.coroutines.launch
             if(messages.isEmpty())item { Column(Modifier.padding(vertical=25.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) { Title("Start with hello.",size=25);Txt("Try sending a message. It stays on this device; there’s no live person or automated reply on the other end.",13,C.muted) } }
             itemsIndexed(messages) { index,m -> Row(Modifier.fillMaxWidth().then(if(motion)Modifier.animateItem()else Modifier),horizontalArrangement=if(m.incoming)Arrangement.Start else Arrangement.End) { Column(Modifier.widthIn(max=270.dp).clip(RoundedCornerShape(16.dp)).background(if(m.incoming)C.soft else C.accentSoft).padding(14.dp),verticalArrangement=Arrangement.spacedBy(4.dp)) { Txt(m.text,14);Txt("Saved locally",9,C.muted) } } }
         }
-        Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)) { OutlinedTextField(text,{ text=it.take(2000) },Modifier.weight(1f),placeholder={ Txt("Say something nice…",13,C.muted) },shape=RoundedCornerShape(16.dp),maxLines=4);IconButton({ if(text.isNotBlank()){send(text);text=""} },enabled=text.isNotBlank()) { Glyph("send",if(text.isNotBlank())Orange else C.muted,Modifier.size(23.dp)) } }
+        Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)) { OutlinedTextField(text,{ text=it.take(2000) },Modifier.weight(1f),placeholder={ Txt("Say something nice…",13,C.muted) },shape=RoundedCornerShape(16.dp),maxLines=4);IconButton({ if(text.isNotBlank()){send(text);text=""} },modifier=Modifier.semantics { contentDescription = "Send message" },enabled=text.isNotBlank()) { Glyph("send",if(text.isNotBlank())Orange else C.muted,Modifier.size(23.dp)) } }
     }
 }
 @Composable fun SettingsSheet(s: SocialState, update: ((SocialState)->SocialState)->Unit, about: () -> Unit) {

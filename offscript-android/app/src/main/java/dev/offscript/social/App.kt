@@ -43,6 +43,14 @@ import kotlinx.coroutines.launch
     val haptic = LocalHapticFeedback.current
     val motion = systemMotion && !state.reduceMotion
     val dark = state.theme == "Dark" || (state.theme == "System" && isSystemInDarkTheme())
+    SideEffect {
+        (context as? android.app.Activity)?.window?.let { window ->
+            androidx.core.view.WindowCompat.getInsetsController(window,window.decorView).apply {
+                isAppearanceLightStatusBars = !dark
+                isAppearanceLightNavigationBars = !dark
+            }
+        }
+    }
     fun notice(s: String) { scope.launch { snack.showSnackbar(s) } }
     fun openPost(type: String, id: Long) { selectedPost = id; sheet = type }
     fun openPerson(id: Int) { if (id == -1) page = "Profile" else { selectedPerson = id; sheet = "person" } }
