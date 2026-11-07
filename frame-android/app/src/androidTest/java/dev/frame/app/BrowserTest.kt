@@ -11,6 +11,9 @@ import java.net.SocketException
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 import org.json.JSONObject
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.Until
 
 @RunWith(AndroidJUnit4::class)
 class BrowserTest {
@@ -47,7 +50,13 @@ class BrowserTest {
             rule.waitUntil(60000){engine.optionsLoaded||engine.pageError.isNotEmpty()}
             Assert.assertTrue("Official extension dashboard must load: ${engine.pageError}",engine.optionsLoaded)
             Assert.assertTrue(engine.currentUrl.startsWith("moz-extension:"))
+            val device=UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
+            val filters=device.wait(Until.findObject(By.textContains("Filter lists")),30000)
+            Assert.assertNotNull("Official dashboard must render its real Filter lists control",filters)
             screenshot("03-ubol-dashboard")
+            filters.click()
+            android.os.SystemClock.sleep(1800)
+            screenshot("03b-ubol-filter-lists")
             rule.onNodeWithContentDescription("Close extension settings").performClick()
             rule.onNodeWithContentDescription("App controls").performClick()
             rule.onNodeWithText("Make it yours.").assertExists()
@@ -78,7 +87,7 @@ private class ProbeServer(private val adPath:String){
             when(path){
                 "/control.js"->{body="window.control=1;";type="application/javascript"}
                 adPath->{adHits.incrementAndGet();body="window.ad=1;";type="application/javascript"}
-                else->{type="text/html";body="""<!doctype html><meta name="viewport" content="width=device-width"><style>body{background:#111b19;color:#f1f5eb;font-family:sans-serif;padding:34px}small{color:#c5f386}h1{font-size:38px}p{line-height:1.7;color:#a2b1a7}.card{padding:22px;background:#1d2a26;border-radius:22px;margin-top:28px}</style><small>FRAME / LIVE BLOCKING TEST</small><h1>A quieter web.<br>Actually verified.</h1><p>This page uses a real rule from the bundled, unmodified uBlock Origin Lite ruleset.</p><div class="card" id="result">Testing requests…</div><script>window.control=0;window.ad=0;</script><script src="/control.js"></script><script src="$adPath"></script><script>document.title='probe:'+new URLSearchParams(location.search).get('phase')+':control='+window.control+';ad='+window.ad;document.getElementById('result').textContent='Normal request: '+(window.control?'loaded':'failed')+' · Ad-pattern request: '+(window.ad?'allowed':'blocked');</script>"""}
+                else->{type="text/html";body="""<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><style>body{background:#111b19;color:#f1f5eb;font-family:sans-serif;padding:34px}small{color:#c5f386}h1{font-size:38px}p{line-height:1.7;color:#a2b1a7}.card{padding:22px;background:#1d2a26;border-radius:22px;margin-top:28px}</style><small>FRAME / LIVE BLOCKING TEST</small><h1>A quieter web.<br>Actually verified.</h1><p>This page uses a real rule from the bundled, unmodified uBlock Origin Lite ruleset.</p><div class="card" id="result">Testing requests…</div><script>window.control=0;window.ad=0;</script><script src="/control.js"></script><script src="$adPath"></script><script>document.title='probe:'+new URLSearchParams(location.search).get('phase')+':control='+window.control+';ad='+window.ad;document.getElementById('result').textContent='Normal request: '+(window.control?'loaded':'failed')+' · Ad-pattern request: '+(window.ad?'allowed':'blocked');</script>"""}
             }
             val bytes=body.toByteArray();s.getOutputStream().write("HTTP/1.1 200 OK\r\nContent-Type: $type\r\nContent-Length: ${bytes.size}\r\nCache-Control: no-store\r\nConnection: close\r\n\r\n".toByteArray()+bytes)
         }}catch(_:SocketException){if(!stopped)throw RuntimeException("Probe socket failed")}catch(_:Exception){}
