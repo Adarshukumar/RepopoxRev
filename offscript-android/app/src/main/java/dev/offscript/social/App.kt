@@ -2,6 +2,9 @@ package dev.offscript.social
 
 import android.content.Intent
 import androidx.activity.compose.BackHandler
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.SystemBarStyle
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
@@ -43,13 +46,10 @@ import kotlinx.coroutines.launch
     val haptic = LocalHapticFeedback.current
     val motion = systemMotion && !state.reduceMotion
     val dark = state.theme == "Dark" || (state.theme == "System" && isSystemInDarkTheme())
-    SideEffect {
-        (context as? android.app.Activity)?.window?.let { window ->
-            androidx.core.view.WindowCompat.getInsetsController(window,window.decorView).apply {
-                isAppearanceLightStatusBars = !dark
-                isAppearanceLightNavigationBars = !dark
-            }
-        }
+    LaunchedEffect(dark) {
+        val style = if(dark) SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+            else SystemBarStyle.light(android.graphics.Color.TRANSPARENT,android.graphics.Color.TRANSPARENT)
+        (context as? ComponentActivity)?.enableEdgeToEdge(statusBarStyle=style,navigationBarStyle=style)
     }
     fun notice(s: String) { scope.launch { snack.showSnackbar(s) } }
     fun openPost(type: String, id: Long) { selectedPost = id; sheet = type }
@@ -61,7 +61,7 @@ import kotlinx.coroutines.launch
             else {
                 BackHandler(page != "Home" && sheet.isEmpty()) { page = "Home"; query = "" }
                 Scaffold(containerColor = C.bg, snackbarHost = { SnackbarHost(snack) }, bottomBar = {
-                    if (page != "Notifications") BottomNavigation(page, { page = it; query = "" }, { sheet = "compose" })
+                    if (page != "Notifications") BottomNavigation(page, { snack.currentSnackbarData?.dismiss(); page = it; query = "" }, { snack.currentSnackbarData?.dismiss(); sheet = "compose" })
                 }) { padding ->
                     Column(Modifier.fillMaxSize().padding(padding)) {
                         Row(Modifier.fillMaxWidth().padding(start = 22.dp, end = 10.dp).height(66.dp), verticalAlignment = Alignment.CenterVertically) {

@@ -6,12 +6,15 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import java.io.File
 import org.junit.Assert.*
+import org.junit.FixMethodOrder
+import org.junit.runners.MethodSorters
 import org.junit.After
 import org.junit.Rule
 import androidx.compose.ui.semantics.SemanticsActions
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @RunWith(AndroidJUnit4::class)
 class AppTest {
     @get:Rule val rule = createAndroidComposeRule<MainActivity>()
@@ -80,6 +83,8 @@ class AppTest {
     private fun screenshot(name: String) {
         rule.waitForIdle()
         val inst=InstrumentationRegistry.getInstrumentation()
+        // Compose idleness precedes SurfaceFlinger presentation; allow the real frame to settle.
+        android.os.SystemClock.sleep(400)
         val bmp=inst.uiAutomation.takeScreenshot()
         val file=File(inst.targetContext.getExternalFilesDir(null),"$name.png")
         file.outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG,100,it) }
