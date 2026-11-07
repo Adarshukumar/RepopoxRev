@@ -43,7 +43,10 @@ jobs:
           set -o pipefail
           gradle testDebugUnitTest --console=plain 2>&1 | tee -a build.log
       - name: Verify APK structure and signature block
-        run: python3 ci/verify_apk.py app/build/outputs/apk/debug/app-debug.apk
+        run: |
+          python3 ci/verify_apk.py app/build/outputs/apk/debug/app-debug.apk
+          SIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
+          "$SIGNER" verify --verbose app/build/outputs/apk/debug/app-debug.apk
       - name: Enable hardware acceleration
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules

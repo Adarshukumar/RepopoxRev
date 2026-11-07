@@ -1,8 +1,8 @@
 # RepopoxRev
 
-## New: Offscript social frontend
+## New: Offscript social app
 
-See [`offscript/`](offscript/README.md) for the responsive social-media UI. Run `cd offscript && npm ci && npm run dev`. This is a standalone frontend demo, not a PRISM update or Android wrapper.
+See [`offscript/`](offscript/README.md) for the responsive social-media UI. Run `cd offscript && npm ci && npm run dev`. The native Android implementation is in [`offscript-android/`](offscript-android/README.md), with its own APK build, offline persistence and emulator tests. Neither version is a PRISM update or an Android WebView wrapper.
 
 ## PRISM — the app in this repository
 

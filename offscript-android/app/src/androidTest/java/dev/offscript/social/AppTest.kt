@@ -57,7 +57,7 @@ class AppTest {
         rule.onNodeWithContentDescription("Save post 1").performScrollTo().performClick()
         rule.onNodeWithContentDescription("Navigate Saved").performClick()
         rule.onNodeWithText("Took the long way home. Would take it again.").performScrollTo().assertIsDisplayed()
-        rule.onNodeWithContentDescription("Comments on post 1").performScrollTo().performSemanticsAction(SemanticsActions.OnClick) { it() }
+        rule.onNodeWithContentDescription("Comments on post 1").performScrollTo().performClick()
         rule.waitForIdle()
         screenshot("06a-opening-comments")
         rule.onNodeWithText("Good things, shared.").assertExists()

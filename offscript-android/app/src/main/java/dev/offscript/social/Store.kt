@@ -3,6 +3,8 @@ package dev.offscript.social
 import android.app.Application
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -48,9 +50,23 @@ class SocialStore(app: Application) : AndroidViewModel(app) {
                     while (maxOf(options.outWidth, options.outHeight) / sample > 1800) sample *= 2
                     val bitmap = resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inSampleSize = sample }) }
                     requireNotNull(bitmap)
+                    val orientation = try { resolver.openInputStream(uri)?.use { ExifInterface(it).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL) } } catch (_: Exception) { null }
+                    val matrix = Matrix().apply {
+                        when(orientation) {
+                            ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> setScale(-1f,1f)
+                            ExifInterface.ORIENTATION_ROTATE_180 -> setRotate(180f)
+                            ExifInterface.ORIENTATION_FLIP_VERTICAL -> setScale(1f,-1f)
+                            ExifInterface.ORIENTATION_TRANSPOSE -> { setRotate(90f); postScale(-1f,1f) }
+                            ExifInterface.ORIENTATION_ROTATE_90 -> setRotate(90f)
+                            ExifInterface.ORIENTATION_TRANSVERSE -> { setRotate(-90f); postScale(-1f,1f) }
+                            ExifInterface.ORIENTATION_ROTATE_270 -> setRotate(270f)
+                        }
+                    }
+                    val normalized = if(matrix.isIdentity) bitmap else Bitmap.createBitmap(bitmap,0,0,bitmap.width,bitmap.height,matrix,true)
                     val folder = File(getApplication<Application>().filesDir, "photos").apply { mkdirs() }
                     val out = File(folder, "${System.currentTimeMillis()}.jpg")
-                    out.outputStream().use { require(bitmap.compress(Bitmap.CompressFormat.JPEG, 86, it)) }
+                    out.outputStream().use { require(normalized.compress(Bitmap.CompressFormat.JPEG, 86, it)) }
+                    if(normalized !== bitmap) normalized.recycle()
                     bitmap.recycle()
                     out.absolutePath
                 } catch (_: Exception) { null } catch (_: OutOfMemoryError) { null }

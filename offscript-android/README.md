@@ -35,6 +35,6 @@ The GitHub Actions workflow installs the toolchain. No Gradle wrapper JAR is bun
 ## Boundaries / follow-up
 - Debug signing is for evaluation, not production. Future CI runs may use different debug keys; uninstalling an older preview may be required and loses local data.
 - No background photo cleanup yet: removing a draft/post does not remove its imported private image file. Clearing app data removes all of it.
-- File import preserves the decoded pixels but does not currently apply EXIF orientation normalization; some camera images may appear rotated.
+- Photo import normalizes EXIF rotation/mirroring and re-encodes JPEGs without location metadata. Animated formats become a single still image.
 - This preview uses a small JSON-backed local store; a production feed should use Room and a server-backed repository, authenticated accounts and moderated media storage.
 - Physical device, large-library stress and full accessibility audits remain separate from the automated emulator smoke tests.
