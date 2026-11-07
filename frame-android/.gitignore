@@ -1,0 +1,39 @@
+# Gradle / Android build output.
+#
+# Nothing under here is source. In particular the APK is never committed: it
+# is produced by CI and attached to a release, so a stale binary in the tree
+# could only ever disagree with the code that built it.
+.gradle/
+build/
+app/build/
+app/release/
+local.properties
+
+# CI scratch
+build.log
+failure-report.md
+notes.md
+prism-*-debug.apk
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+
+# Kotlin
+.kotlin/
+report.md
+screenshots/
+offscript-*.apk
+SHA256SUMS.txt
+
+screenshot-comment.md
+app/src/main/assets/ubol/
+geckoview-version.txt
+ubol-id.txt
+upstream/
+*.apk
+*.tar.gz
+*.xpi
+build-manifest.json
+screenshot-comment.md
