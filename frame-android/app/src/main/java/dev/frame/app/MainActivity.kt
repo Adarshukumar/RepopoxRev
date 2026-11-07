@@ -19,7 +19,10 @@ class MainActivity: ComponentActivity() {
     }
     override fun onCreate(savedInstanceState:Bundle?){
         val splash=installSplashScreen();super.onCreate(savedInstanceState);enableEdgeToEdge()
-        splash.setOnExitAnimationListener { p -> p.view.animate().alpha(0f).setDuration(180).withEndAction{p.remove()}.start() }
+        splash.setOnExitAnimationListener { p ->
+            val motion=android.provider.Settings.Global.getFloat(contentResolver,android.provider.Settings.Global.ANIMATOR_DURATION_SCALE,1f)!=0f && !getSharedPreferences("frame",0).getBoolean("reduceMotion",false)
+            if(motion)p.view.animate().alpha(0f).setDuration(180).withEndAction{p.remove()}.start()else p.remove()
+        }
         engine=BrowserEngine.get(this)
         engine.permissions={message,reply->AlertDialog.Builder(this).setTitle("Extension permission").setMessage(message).setPositiveButton("Allow"){_,_->reply(true)}.setNegativeButton("Not now"){_,_->reply(false)}.setOnCancelListener{reply(false)}.show()}
         engine.external={url->

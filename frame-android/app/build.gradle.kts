@@ -5,7 +5,7 @@ plugins {
 }
 android {
     namespace = "dev.frame.app"
-    compileSdk = 36
+    compileSdk = 37
     defaultConfig {
         applicationId = "dev.frame.app"
         minSdk = 26

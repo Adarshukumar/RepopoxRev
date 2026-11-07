@@ -31,7 +31,9 @@ jobs:
         with:
           gradle-version: '9.3.1'
       - name: Prepare verified upstream extension and engine
-        run: python3 ci/prepare.py | tee build-manifest.log
+        run: |
+          set -o pipefail
+          python3 ci/prepare.py 2>&1 | tee build-manifest.log
       - name: Configure
         run: |
           set -o pipefail
@@ -77,6 +79,7 @@ jobs:
             grep -E '^e: |^error: |^ERROR: |FAIL|failed|tests completed|BUILD SUCCESSFUL|BUILD FAILED' build.log | tail -65
             find app/build -name '*.xml' -path '*test-results*' -exec grep -h '<testsuite ' {} \; | head -15
             find app/build/outputs/androidTest-results -name '*.xml' -exec head -c 9000 {} \;
+            cat build-manifest.log
             cat build-manifest.json
             tail -55 build.log
             tail -50 screenshots/logcat-errors.txt
@@ -110,4 +113,7 @@ jobs:
         run: |
           cp app/build/outputs/apk/debug/app-arm64-v8a-debug.apk frame-1.0.0-preview.apk
           sha256sum frame-1.0.0-preview.apk > SHA256SUMS.txt
-          gh release create frame-v1.0.0 frame-1.0.0-preview.apk SHA256SUMS.txt --target "$GITHUB_SHA" --title 'Frame 1.0.0 — Website app with uBlock Origin Lite' --notes-file RELEASE.md
+          git archive --format=tar.gz --output=frame-source.tar.gz "$GITHUB_SHA" frame-android .github/workflows/build-frame.yml
+          git clone --depth 1 --branch 2026.1103.1743 --recurse-submodules --shallow-submodules https://github.com/uBlockOrigin/uBOL-home.git upstream/source
+          tar --exclude=.git -czf ubOLite-corresponding-source.tar.gz -C upstream source
+          gh release create frame-v1.0.0 frame-1.0.0-preview.apk SHA256SUMS.txt build-manifest.json frame-source.tar.gz ubOLite-corresponding-source.tar.gz upstream/*.xpi --target "$GITHUB_SHA" --title 'Frame 1.0.0 — Website app with uBlock Origin Lite' --notes-file RELEASE.md

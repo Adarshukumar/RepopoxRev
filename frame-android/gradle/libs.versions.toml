@@ -3,7 +3,7 @@
 # matters more than picking a fashionable one: this project is authored somewhere with
 # no JDK and no Android SDK, so nothing here can be compiled locally to check.
 [versions]
-androidGradlePlugin = "9.0.0"
+androidGradlePlugin = "9.1.0"
 kotlin = "2.3.10"
 compose = "1.10.2"
 material3 = "1.5.0-alpha18"
