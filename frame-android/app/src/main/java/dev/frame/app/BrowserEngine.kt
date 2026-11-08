@@ -45,7 +45,7 @@ class BrowserEngine private constructor(context: Context) {
         controller.promptDelegate=object: WebExtensionController.PromptDelegate {
             override fun onOptionalPrompt(extension: WebExtension, permissions: Array<String>, origins: Array<String>, dataCollectionPermissions: Array<String>): GeckoResult<AllowOrDeny> {
                 val result=GeckoResult<AllowOrDeny>()
-                this@BrowserEngine.permissions?.invoke("uBlock Origin Lite requests:\n${(permissions.toList()+origins.toList()).joinToString("\n")}") { allow -> result.complete(if(allow)AllowOrDeny.ALLOW else AllowOrDeny.DENY) } ?: result.complete(AllowOrDeny.DENY)
+                this@BrowserEngine.permissions?.invoke("${BuildConfig.EXTENSION_NAME} requests:\n${(permissions.toList()+origins.toList()).joinToString("\n")}") { allow -> result.complete(if(allow)AllowOrDeny.ALLOW else AllowOrDeny.DENY) } ?: result.complete(AllowOrDeny.DENY)
                 return result
             }
         }
@@ -60,7 +60,7 @@ class BrowserEngine private constructor(context: Context) {
             op.accept({updated -> if(updated!=null)attach(updated);ready=true;installing=false;if(home.isNotEmpty())openHome() },{ error -> fail(error.toString()) })
         },{error -> fail(error.toString())})
     }
-    private fun fail(message:String){installing=false;changing=false;installError="uBlock Origin Lite could not be initialized. $message"}
+    private fun fail(message:String){installing=false;changing=false;installError="${BuildConfig.EXTENSION_NAME} could not be initialized. $message"}
     private fun attach(ext:WebExtension){
         extension=ext
         ext.setTabDelegate(object:WebExtension.TabDelegate {

@@ -3,18 +3,21 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
 }
+val fullUbo = System.getenv("FRAME_FULL_UBO") == "true"
 android {
     namespace = "dev.frame.app"
     compileSdk = 37
     defaultConfig {
-        applicationId = "dev.frame.app"
+        applicationId = if(fullUbo) "dev.frame.app.ubo" else "dev.frame.app"
+        manifestPlaceholders["appLabel"] = if(fullUbo) "Frame uBO" else "Frame"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "UBOL_ID", "\"" + rootProject.file("ubol-id.txt").readText().trim() + "\"")
-        buildConfigField("String", "UBOL_VERSION", "\"2026.1103.1743\"")
+        buildConfigField("String", "UBOL_VERSION", "\"${if(fullUbo) "1.75.4" else "2026.1103.1743"}\"")
+        buildConfigField("String", "EXTENSION_NAME", "\"${if(fullUbo) "uBlock Origin" else "uBlock Origin Lite"}\"")
     }
     buildTypes { debug { isMinifyEnabled = false } }
     compileOptions { sourceCompatibility = JavaVersion.VERSION_21; targetCompatibility = JavaVersion.VERSION_21 }

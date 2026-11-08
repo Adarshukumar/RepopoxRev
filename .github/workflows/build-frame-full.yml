@@ -1,0 +1,131 @@
+name: Frame full uBlock Origin experiment
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish separate experimental APK after core checks
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: frame-full-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  android:
+    env:
+      FRAME_FULL_UBO: "true"
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: frame-android
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.3.1'
+      - name: Prepare verified upstream extension and engine
+        run: |
+          set -o pipefail
+          python3 ci/prepare_full.py 2>&1 | tee build-manifest.log
+      - name: Configure
+        run: |
+          set -o pipefail
+          gradle projects --console=plain 2>&1 | tee build.log
+      - name: Compile native app and test APK
+        run: |
+          set -o pipefail
+          gradle assembleDebug assembleDebugAndroidTest --console=plain 2>&1 | tee -a build.log
+      - name: Domain unit tests
+        run: |
+          set -o pipefail
+          gradle testDebugUnitTest --console=plain 2>&1 | tee -a build.log
+      - name: Verify APK structure and signature block
+        run: |
+          python3 ci/verify_extension.py app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
+          python3 ci/verify_apk.py app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
+          SIGNER=$(find "$ANDROID_HOME/build-tools" -name apksigner | sort -V | tail -1)
+          "$SIGNER" verify --verbose app/build/outputs/apk/debug/app-arm64-v8a-debug.apk
+      - name: Enable hardware acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Native emulator interaction tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          ram-size: 4096M
+          heap-size: 512M
+          cores: 2
+          disable-animations: true
+          working-directory: frame-android
+          script: bash ci/emulator_full.sh
+      - name: Report errors and test results
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          set +o pipefail
+          {
+            echo '### Frame full uBlock Origin experiment validation'
+            echo '```'
+            grep -E '^e: |^error: |^ERROR: |FAIL|failed|tests completed|BUILD SUCCESSFUL|BUILD FAILED' build.log | tail -65
+            find app/build -name '*.xml' -path '*test-results*' -exec grep -h '<testsuite ' {} \; | head -15
+            find app/build/outputs/androidTest-results -name '*.xml' -exec head -c 9000 {} \;
+            cat build-manifest.log
+            cat build-manifest.json
+            tail -55 build.log
+            cat screenshots/extension-log.txt
+            cat screenshots/system-errors.txt
+            cat screenshots/youtube-result.txt
+            tail -15 screenshots/logcat-errors.txt
+            echo '```'
+          } > report.md
+          gh api -X POST "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments" -F body=@report.md
+          exit 0
+      - name: Post native screenshot previews
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -m pip install --quiet Pillow
+          python3 ci/screenshots.py
+      - name: Upload APK and test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frame-full-ubo-experiment
+          path: |
+            frame-android/app/build/outputs/apk/debug/*.apk
+            frame-android/app/build/reports/androidTests/
+            frame-android/app/build/reports/tests/
+            frame-android/screenshots/
+            frame-android/build.log
+            frame-android/build-manifest.json
+            frame-android/youtube.log
+      - name: Publish installable preview
+        if: github.event_name == 'workflow_dispatch' && inputs.publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -o pipefail
+          bash ci/publish_full.sh 2>&1 | tee publish.log
+      - name: Report publication error
+        if: failure() && github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          tail -c 18000 publish.log > publication-error.md
+          gh api -X POST "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/comments" -F body=@publication-error.md
+          exit 0

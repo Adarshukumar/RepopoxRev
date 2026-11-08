@@ -43,3 +43,6 @@ publish.log
 publication-error.md
 build-manifest.log
 app/src/main/assets/probe.json
+
+youtube.log
+full-release-notes.md
