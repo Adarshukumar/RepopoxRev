@@ -16,6 +16,9 @@ open('candidate-sha.txt','w').write(r['headSha'])
 PY
 SOURCE_SHA=$(cat candidate-sha.txt)
 git merge-base --is-ancestor "$SOURCE_SHA" HEAD
+# Publication-only commits may differ; application and extension-preparation
+# sources must still be identical to the tested artifact.
+git diff --exit-code "$SOURCE_SHA" "$GITHUB_SHA" -- app/src app/build.gradle.kts ci/prepare_full.py
 gh run download "$SOURCE_RUN" --name frame-full-ubo-experiment --dir candidate
 python3 - <<'PY'
 import json,pathlib,xml.etree.ElementTree as E
@@ -64,4 +67,4 @@ printf '\nTested source: `%s`. [Original test run](https://github.com/%s/actions
 printf '\nAPK SHA256:\n```\n' >> device-release-notes.md
 cat SHA256SUMS.txt >> device-release-notes.md
 printf '```\n' >> device-release-notes.md
-gh release create frame-youtube-v1.1.0-device-preview frame-youtube-1.1.0-device-preview.apk SHA256SUMS.txt candidate/build-manifest.json frame-source.tar.gz ublock-corresponding-source.tar.gz candidate-upstream/*.xpi frame-screenshots.zip candidate/screenshots/blocking-evidence.json candidate/screenshots/youtube-playback-evidence.json candidate/screenshots/youtube-result.txt --target "$SOURCE_SHA" --prerelease --title 'Frame YouTube 1.1 — device preview, full uBlock Origin' --notes-file device-release-notes.md
+gh release create frame-youtube-v1.1.0-device-preview frame-youtube-1.1.0-device-preview.apk SHA256SUMS.txt candidate/build-manifest.json frame-source.tar.gz ublock-corresponding-source.tar.gz candidate-upstream/*.xpi frame-screenshots.zip candidate/screenshots/blocking-evidence.json candidate/screenshots/youtube-playback-evidence.json candidate/screenshots/youtube-result.txt --target "$GITHUB_SHA" --prerelease --title 'Frame YouTube 1.1 — device preview, full uBlock Origin' --notes-file device-release-notes.md
