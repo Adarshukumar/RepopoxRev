@@ -12,8 +12,8 @@ android {
         manifestPlaceholders["appLabel"] = if(fullUbo) "Frame uBO" else "Frame"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = if(fullUbo) 2 else 1
+        versionName = if(fullUbo) "1.1.0-full" else "1.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "UBOL_ID", "\"" + rootProject.file("ubol-id.txt").readText().trim() + "\"")
         buildConfigField("String", "UBOL_VERSION", "\"${if(fullUbo) "1.75.4" else "2026.1103.1743"}\"")

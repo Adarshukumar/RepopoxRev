@@ -39,12 +39,23 @@ class BrowserTest {
             rule.waitUntil(60000){engine.title.startsWith("probe:disabled:")}
             Assert.assertEquals("probe:disabled:control=1;ad=1",engine.title)
             Assert.assertTrue("Control must reach server when extension is disabled",probe.adHits.get()>0)
+            val disabledHits=probe.adHits.get()
             changed=false
             rule.runOnUiThread{engine.setBlocking(true){changed=it}}
             rule.waitUntil(30000){changed}
             rule.runOnUiThread{engine.load("http://127.0.0.1:${probe.port}/?phase=reenabled")}
             rule.waitUntil(60000){engine.title.startsWith("probe:reenabled:")}
             Assert.assertEquals("probe:reenabled:control=1;ad=0",engine.title)
+            Assert.assertEquals("Re-enabled request must not reach the server",disabledHits,probe.adHits.get())
+            val evidence=JSONObject().put("extension",BuildConfig.EXTENSION_NAME).put("rulePath",path)
+                .put("enabledAdRequests",0).put("disabledAdRequests",disabledHits)
+                .put("reenabledAdditionalAdRequests",probe.adHits.get()-disabledHits)
+                .put("normalScriptExecutedInAllPhases",true)
+                .put("scope","Controlled upstream-rule network experiment, NOT a YouTube video-ad experiment")
+            val file=File(ctx.getExternalFilesDir(null),"blocking-evidence.json")
+            file.writeText(evidence.toString(2))
+            val inst=InstrumentationRegistry.getInstrumentation()
+            android.os.ParcelFileDescriptor.AutoCloseInputStream(inst.uiAutomation.executeShellCommand("cp ${file.absolutePath} /sdcard/Download/blocking-evidence.json")).use{it.readBytes()}
             screenshot("02-verified-filtering")
             rule.runOnUiThread{engine.runtime.settings.setForceEnableAccessibility(true);engine.openOptions()}
             rule.waitUntil(60000){engine.optionsLoaded&&engine.currentUrl.startsWith("moz-extension:")||engine.pageError.isNotEmpty()}

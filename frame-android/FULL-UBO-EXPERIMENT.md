@@ -1,20 +1,28 @@
-# Frame with full uBlock Origin — experiment
+# Frame YouTube Preview — full uBlock Origin
 
-Same Frame interface and features, with the genuine unmodified Firefox **uBlock Origin 1.75.4** replacing Lite in this build only. The live YouTube website is loaded by GeckoView; this does not modify or redistribute the official YouTube Android APK. No claim of guaranteed ad-free YouTube.
+Same Frame interface and features, with genuine unmodified Firefox **uBlock Origin 1.75.4** replacing Lite in this separate build. YouTube is prefilled during setup; acknowledge website-access permission and launch. This uses the live YouTube website, **not a modified official YouTube APK**, and does not promise permanently ad-free YouTube.
 
-## Attempt result — not released
+## Install (when publication checks pass)
+**[Download the Android APK](https://github.com/Adarshukumar/RepopoxRev/releases/download/frame-youtube-v1.1.0/frame-youtube-1.1.0-preview.apk)** — ARM64 Android 8+.
 
-[CI run 42438354400](https://github.com/Adarshukumar/RepopoxRev/actions/runs/42438354400) built the app, passed 13 URL unit tests and APK/unchanged-extension verification, and installed full uBO in the emulator. However, the first enabled-filtering assertion failed: expected `probe:enabled:control=1;ad=0`, observed `probe:enabled:control=1;ad=1`. The bundled rule was `/ea/fl.js` from `assets/ublock/filters.min.txt`. Logs also reported a script timeout in upstream `js/cachestorage.js` during IndexedDB writes. The root cause is not established; this is not evidence that full uBO can never work in GeckoView.
+Open `frame-youtube-1.1.0-preview.apk`, not a source/screenshot ZIP. It appears as **Frame uBO** alongside your existing Frame app; Lite and its data are untouched. This separate app has its own cookies/settings. Debug-signed preview, not production signing.
 
-The publication gate correctly stopped the release. The separate YouTube check was **not reached**. No claim of working/ad-free YouTube or verified full-uBO settings is made. The original Lite regression run [42438352059](https://github.com/Adarshukumar/RepopoxRev/actions/runs/42438352059) passed. Its existing release and installed data were not changed. The experiment is now manual-dispatch only.
+## What changed / how blocking works
+The original experiment failed its initial blocking check. Upstream `start.js/onVersionReady` deliberately unsuspends requests during first installation, before all filter lists are ready. Frame now waits for an actual blocking capability check on a fresh full-uBO profile before opening the chosen website. It fails visibly rather than silently opening the site without verified initial filtering. First initialization can take up to two minutes. Later deliberate user filter-list changes are respected; this initial check is not a per-site guarantee.
 
-## Intended installation if future checks pass
-ARM64 Android 8+. Install `frame-full-ubo-experiment.apk`. It appears as **Frame uBO** alongside your existing Frame app; your Lite installation and its data are untouched. This separate app starts with its own settings/cookies: enter `https://m.youtube.com/` once. Debug-signed experimental build, not production signing.
+Full uBO performs filtering through its real upstream network engine and content filters/scriptlets. No Frame ad-hiding imitation, custom YouTube bypass or modified upstream code is substituted. Changing YouTube behavior can still break filtering.
 
-## What is tested
-Publication requires all 13 URL unit tests, byte-for-byte extension/APK verification, and the genuine extension's enabled-blocked → disabled-allowed → re-enabled-blocked network experiment, plus official settings navigation and native controls. The fixture rule is selected from the shipped default uBlock filter list, not injected.
+[Readiness-fix validation run 42490474587](https://github.com/Adarshukumar/RepopoxRev/actions/runs/42490474587) passed the controlled enabled/disabled/re-enabled blocking checks, official settings/native controls, and YouTube homepage navigation. That earlier navigation check alone did not prove playback or video-ad removal.
 
-YouTube navigation is attempted separately with a hard timeout and its actual outcome appended below. It does **not** establish video playback, sign-in, video-ad removal, or resistance to anti-adblock changes. Physical-device playback testing is still necessary.
+## Attached evidence and its limits
+Publication now also requires a real public YouTube video to decode frames and advance its media time at least 10 seconds. The separate read-only test observer has no blocking or player-manipulation functionality. Its assets live in the debug APK but it is installed/activated only by instrumentation, never during normal app use.
 
-## Reproduce / provenance
-Run the `Frame full uBlock Origin experiment` workflow on the session branch. `FRAME_FULL_UBO=true` and `ci/prepare_full.py` select the experiment; normal builds remain Lite. The XPI is pinned to upstream SHA256 `e2df503cce7cf5069130618c349695f62bdddb9eb8c189156d027269ae4ae267` and checked against GitHub's release digest. The unmodified original XPI, Frame source and recursively populated upstream source accompany the release. Frame/uBO: GPL-3.0; GeckoView: MPL-2.0 and third-party notices. Existing Frame limitations still apply (see README).
+- `blocking-evidence.json`: actual loopback request counts with full uBO enabled, disabled, and re-enabled, using an unchanged default upstream rule. This proves that filtering works, **not specifically that YouTube video ads were removed**.
+- `youtube-playback-evidence.json`: observed playback time, decoded frames and detected ad markers for the public test video. **Seeing no ad is not proof that an ad was removed.** Ad delivery varies by session, region and account.
+- `frame-screenshots.zip`: actual emulator screenshots, not design mockups.
+- `youtube-result.txt`: actual test outcome/log summary.
+
+13 URL unit tests and byte-for-byte extension/APK signature checks are also required. Full-uBO settings and native controls must pass their integration test. No guarantee of every video, login provider, DRM or permanent ad blocking; existing Frame feature limitations still apply.
+
+## Source and reproducibility
+Run the `Frame full uBlock Origin experiment` workflow. `FRAME_FULL_UBO=true` and `ci/prepare_full.py` select full uBO; ordinary builds remain Lite. Signed upstream XPI SHA256: `e2df503cce7cf5069130618c349695f62bdddb9eb8c189156d027269ae4ae267`, verified against GitHub's release digest. The original XPI, Frame source and recursively populated upstream source accompany publication. Frame/uBO: GPL-3.0; GeckoView: MPL-2.0 plus third-party notices. Not affiliated with YouTube, Mozilla or uBlock Origin.

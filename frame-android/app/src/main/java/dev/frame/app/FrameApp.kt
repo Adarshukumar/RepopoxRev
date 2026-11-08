@@ -116,7 +116,7 @@ private val Quiet=Color(0xFFA2B1A7)
 @Composable private fun SettingRow(title:String,subtitle:String,icon:String,onClick:()->Unit){Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).clickable(onClick=onClick).padding(vertical=8.dp),verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text(title,color=MaterialTheme.colorScheme.onSurface,fontSize=14.sp,fontWeight=FontWeight.Medium);Body(subtitle,11)};Mark(icon,MaterialTheme.colorScheme.onSurfaceVariant,Modifier.size(19.dp))}}
 @Composable private fun ToggleRow(title:String,subtitle:String,value:Boolean,onChange:(Boolean)->Unit){Row(verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text(title,color=MaterialTheme.colorScheme.onSurface,fontSize=14.sp);Body(subtitle,11)};Switch(value,onChange)}}
 @Composable private fun Setup(initial:String,editing:Boolean,cancel:()->Unit,save:(String)->Unit){
-    var url by rememberSaveable{mutableStateOf(initial)}
+    var url by rememberSaveable{mutableStateOf(if(initial.isEmpty() && BuildConfig.UBOL_ID=="uBlock0@raymondhill.net") "https://m.youtube.com/" else initial)}
     var error by rememberSaveable{mutableStateOf("")}
     var consent by rememberSaveable{mutableStateOf(editing)}
     Column(Modifier.fillMaxSize().safeDrawingPadding().imePadding().verticalScroll(rememberScrollState()).padding(26.dp),verticalArrangement=Arrangement.spacedBy(24.dp)){
