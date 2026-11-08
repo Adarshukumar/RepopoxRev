@@ -1,8 +1,5 @@
 name: Frame full uBlock Origin experiment
 on:
-  push:
-    branches: [arena/c4a5f7e4-repopoxrev]
-    paths: [".github/workflows/build-frame-full.yml", "frame-android/ci/*full*", "frame-android/FULL-UBO-EXPERIMENT.md"]
   workflow_dispatch:
     inputs:
       publish:

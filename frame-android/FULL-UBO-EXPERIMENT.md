@@ -2,7 +2,13 @@
 
 Same Frame interface and features, with the genuine unmodified Firefox **uBlock Origin 1.75.4** replacing Lite in this build only. The live YouTube website is loaded by GeckoView; this does not modify or redistribute the official YouTube Android APK. No claim of guaranteed ad-free YouTube.
 
-## Install
+## Attempt result — not released
+
+[CI run 42438354400](https://github.com/Adarshukumar/RepopoxRev/actions/runs/42438354400) built the app, passed 13 URL unit tests and APK/unchanged-extension verification, and installed full uBO in the emulator. However, the first enabled-filtering assertion failed: expected `probe:enabled:control=1;ad=0`, observed `probe:enabled:control=1;ad=1`. The bundled rule was `/ea/fl.js` from `assets/ublock/filters.min.txt`. Logs also reported a script timeout in upstream `js/cachestorage.js` during IndexedDB writes. The root cause is not established; this is not evidence that full uBO can never work in GeckoView.
+
+The publication gate correctly stopped the release. The separate YouTube check was **not reached**. No claim of working/ad-free YouTube or verified full-uBO settings is made. The original Lite regression run [42438352059](https://github.com/Adarshukumar/RepopoxRev/actions/runs/42438352059) passed. Its existing release and installed data were not changed. The experiment is now manual-dispatch only.
+
+## Intended installation if future checks pass
 ARM64 Android 8+. Install `frame-full-ubo-experiment.apk`. It appears as **Frame uBO** alongside your existing Frame app; your Lite installation and its data are untouched. This separate app starts with its own settings/cookies: enter `https://m.youtube.com/` once. Debug-signed experimental build, not production signing.
 
 ## What is tested
