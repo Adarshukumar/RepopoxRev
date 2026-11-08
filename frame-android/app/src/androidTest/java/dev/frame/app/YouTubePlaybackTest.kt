@@ -33,7 +33,7 @@ class YouTubePlaybackTest {
         rule.waitUntil(30000){observer!=null||failure.isNotEmpty()}
         Assert.assertNotNull(failure,observer)
         rule.runOnUiThread{
-            engine.current!!.webExtensionController.setMessageDelegate(observer!!,object:WebExtension.MessageDelegate{
+            observer!!.setMessageDelegate(object:WebExtension.MessageDelegate{
                 override fun onMessage(nativeApp:String,message:Any,sender:WebExtension.MessageSender):GeckoResult<Any>?{
                     if(nativeApp=="frameEvidence" && message is JSONObject && android.net.Uri.parse(message.optString("url")).host in setOf("m.youtube.com","www.youtube.com","youtube.com"))samples.add(message)
                     return GeckoResult.fromValue<Any>(true)
@@ -76,5 +76,9 @@ class YouTubePlaybackTest {
         inst.uiAutomation.takeScreenshot()?.let{bmp->shot.outputStream().use{bmp.compress(android.graphics.Bitmap.CompressFormat.PNG,100,it)}}
         inst.uiAutomation.executeShellCommand("cp ${shot.absolutePath} $dir/frame-06-youtube-playback.png").use{android.os.ParcelFileDescriptor.AutoCloseInputStream(it).readBytes()}
         android.util.Log.i("FrameTest","YouTube samples=${samples.size}; videoAdvanced=${samples.any{it.optDouble("time")>=10 && it.optInt("frames")>10}}; adMarkersObserved=${samples.any{it.optBoolean("adMarker")}}")
+        // Unload the active media document before ActivityScenario destroys its
+        // rendering surface. Evidence above is captured before this cleanup.
+        rule.runOnUiThread{engine.load("about:blank")}
+        rule.waitUntil(15000){engine.currentUrl=="about:blank" && !engine.loading}
     }
 }

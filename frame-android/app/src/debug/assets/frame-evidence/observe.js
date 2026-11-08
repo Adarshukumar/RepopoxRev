@@ -5,7 +5,7 @@ setInterval(() => {
     const play = document.querySelector('.ytp-large-play-button, button[aria-label="Play"]');
     const rect = (play || video)?.getBoundingClientRect();
     const quality = video?.getVideoPlaybackQuality?.();
-    browser.runtime.sendNativeMessage('frameEvidence', {
+    browser.runtime.sendMessage({
         url: location.origin + location.pathname,
         title: document.title,
         time: video?.currentTime || 0,
