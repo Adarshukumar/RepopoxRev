@@ -27,7 +27,7 @@ class BrowserTest {
             val engine=rule.activity.engine
             val probeHome="http://127.0.0.1:${probe.port}/?phase=enabled"
             rule.runOnUiThread{engine.saveHome(probeHome)}
-            rule.waitUntil(120000){engine.ready||engine.installError.isNotEmpty()}
+            rule.waitUntil(150000){engine.ready||engine.installError.isNotEmpty()}
             Assert.assertTrue("Extension initialization: ${engine.installError}",engine.ready)
             rule.waitUntil(60000){engine.title.startsWith("probe:enabled:")}
             Assert.assertEquals("probe:enabled:control=1;ad=0",engine.title)
@@ -80,7 +80,7 @@ class BrowserTest {
     @Test fun publicYouTubePageSmoke(){
         val engine=rule.activity.engine
         rule.runOnUiThread{engine.saveHome("https://m.youtube.com/")}
-        rule.waitUntil(120000){engine.ready||engine.installError.isNotEmpty()}
+        rule.waitUntil(150000){engine.ready||engine.installError.isNotEmpty()}
         Assert.assertTrue(engine.installError,engine.ready)
         rule.waitUntil(60000){engine.currentUrl.contains("youtube.com")&&engine.title.contains("YouTube",ignoreCase=true)&&!engine.loading || engine.pageError.isNotEmpty()}
         Assert.assertTrue(engine.pageError,engine.pageError.isEmpty())
@@ -105,7 +105,7 @@ private class ProbeServer(private val adPath:String){
             when(path){
                 "/control.js"->{body="window.control=1;";type="application/javascript"}
                 adPath->{adHits.incrementAndGet();body="window.ad=1;";type="application/javascript"}
-                else->{type="text/html";body="""<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><style>body{background:#111b19;color:#f1f5eb;font-family:sans-serif;padding:34px}small{color:#c5f386}h1{font-size:38px}p{line-height:1.7;color:#a2b1a7}.card{padding:22px;background:#1d2a26;border-radius:22px;margin-top:28px}</style><small>FRAME / LIVE BLOCKING TEST</small><h1>A quieter web.<br>Actually verified.</h1><p>This page uses a real rule from the bundled, unmodified uBlock Origin Lite ruleset.</p><div class="card" id="result">Testing requests…</div><script>window.control=0;window.ad=0;</script><script src="/control.js"></script><script src="$adPath"></script><script>document.title='probe:'+new URLSearchParams(location.search).get('phase')+':control='+window.control+';ad='+window.ad;document.getElementById('result').textContent='Normal request: '+(window.control?'loaded':'failed')+' · Ad-pattern request: '+(window.ad?'allowed':'blocked');</script>"""}
+                else->{type="text/html";body="""<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width"><style>body{background:#111b19;color:#f1f5eb;font-family:sans-serif;padding:34px}small{color:#c5f386}h1{font-size:38px}p{line-height:1.7;color:#a2b1a7}.card{padding:22px;background:#1d2a26;border-radius:22px;margin-top:28px}</style><small>FRAME / LIVE BLOCKING TEST</small><h1>A quieter web.<br>Actually verified.</h1><p>This page uses a real rule from the bundled, unmodified ${BuildConfig.EXTENSION_NAME} filter list.</p><div class="card" id="result">Testing requests…</div><script>window.control=0;window.ad=0;</script><script src="/control.js"></script><script src="$adPath"></script><script>document.title='probe:'+new URLSearchParams(location.search).get('phase')+':control='+window.control+';ad='+window.ad;document.getElementById('result').textContent='Normal request: '+(window.control?'loaded':'failed')+' · Ad-pattern request: '+(window.ad?'allowed':'blocked');</script>"""}
             }
             val bytes=body.toByteArray();s.getOutputStream().write("HTTP/1.1 200 OK\r\nContent-Type: $type\r\nContent-Length: ${bytes.size}\r\nCache-Control: no-store\r\nConnection: close\r\n\r\n".toByteArray()+bytes)
         }}catch(_:SocketException){if(!stopped)throw RuntimeException("Probe socket failed")}catch(_:Exception){}

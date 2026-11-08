@@ -57,7 +57,16 @@ class BrowserEngine private constructor(context: Context) {
             if(ext==null){ fail("The engine returned no extension.");return@accept }
             attach(ext)
             val op=if(enabled)controller.enable(ext,WebExtensionController.EnableSource.USER) else controller.disable(ext,WebExtensionController.EnableSource.USER)
-            op.accept({updated -> if(updated!=null)attach(updated);ready=true;installing=false;if(home.isNotEmpty())openHome() },{ error -> fail(error.toString()) })
+            op.accept({updated ->
+                if(updated!=null)attach(updated)
+                val finish={ready=true;installing=false;if(home.isNotEmpty())openHome()}
+                if(enabled && BuildConfig.UBOL_ID=="uBlock0@raymondhill.net" && !prefs.getBoolean("fullUboInitialized",false)){
+                    FilteringWarmup(this){ok ->
+                        if(ok){prefs.edit().putBoolean("fullUboInitialized",true).apply();finish()}
+                        else fail("The first-install filtering check did not pass. Your website was not opened unprotected. Retry initialization.")
+                    }.start()
+                } else finish()
+            },{ error -> fail(error.toString()) })
         },{error -> fail(error.toString())})
     }
     private fun fail(message:String){installing=false;changing=false;installError="${BuildConfig.EXTENSION_NAME} could not be initialized. $message"}

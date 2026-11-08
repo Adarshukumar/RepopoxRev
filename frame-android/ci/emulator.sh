@@ -11,6 +11,6 @@ mkdir -p screenshots
 timeout 20s adb pull /sdcard/Download/. screenshots/
 timeout 20s adb logcat -d > screenshots/logcat-full.txt
 grep -Ei "FATAL EXCEPTION|WATCHDOG|lmkd|lowmemorykiller|am_crash|System has crashed" screenshots/logcat-full.txt | tail -50 > screenshots/system-errors.txt
-grep -Ei 'GeckoConsole|FrameTest|ExtensionError|WebExtension|GeckoSession|GeckoViewContent|GeckoViewNavigation' screenshots/logcat-full.txt | tail -100 > screenshots/extension-log.txt
+grep -Ei 'GeckoConsole|FrameTest|FrameWarmup|ExtensionError|WebExtension|GeckoSession|GeckoViewContent|GeckoViewNavigation' screenshots/logcat-full.txt | tail -100 > screenshots/extension-log.txt
 timeout 20s adb logcat -d -t 2000 '*:E' > screenshots/logcat-errors.txt
 exit "$status"
