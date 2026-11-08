@@ -132,7 +132,7 @@ class BrowserEngine private constructor(context: Context) {
             override fun onNewSession(session:GeckoSession,uri:String):GeckoResult<GeckoSession>{
                 val next=newSession(false);windows.add(session);current=next;return GeckoResult.fromValue(next)
             }
-            override fun onLoadError(session:GeckoSession,uri:String?,error:WebRequestError):GeckoResult<String>?{if(session===current){loading=false;pageError="This page couldn’t open. Check your connection or try another website. Security errors are never bypassed."};return null}
+            override fun onLoadError(session:GeckoSession,uri:String?,error:WebRequestError):GeckoResult<String>?{android.util.Log.w("FrameNetwork","Navigation error code=${error.code}; category=${error.category}; host=${uri?.let{android.net.Uri.parse(it).host}}");if(session===current){loading=false;pageError="This page couldn’t open. Check your connection or try another website. Security errors are never bypassed."};return null}
         }
         s.progressDelegate=object:GeckoSession.ProgressDelegate {
             override fun onPageStart(session:GeckoSession,url:String){if(session===current){currentUrl=url;loading=true;pageError=""}}

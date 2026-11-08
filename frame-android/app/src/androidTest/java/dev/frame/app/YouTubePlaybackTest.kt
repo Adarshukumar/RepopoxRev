@@ -22,9 +22,10 @@ class YouTubePlaybackTest {
     @Test fun realVideoAdvancesWithFullUbo(){
         val engine=rule.activity.engine
         val url="https://m.youtube.com/watch?v=aqz-KE-bpKQ" // Blender Foundation's Big Buck Bunny
-        rule.runOnUiThread{engine.saveHome(url)}
+        rule.runOnUiThread{engine.saveHome("about:blank")}
         rule.waitUntil(150000){engine.ready||engine.installError.isNotEmpty()}
         Assert.assertTrue(engine.installError,engine.ready)
+        rule.waitUntil(30000){engine.currentUrl=="about:blank" && !engine.loading}
         var observer:WebExtension?=null
         rule.runOnUiThread{
             engine.controller.ensureBuiltIn("resource://android/assets/frame-evidence/","frame-evidence@test.invalid").accept({observer=it},{failure=it.toString()})
@@ -34,11 +35,11 @@ class YouTubePlaybackTest {
         rule.runOnUiThread{
             engine.current!!.webExtensionController.setMessageDelegate(observer!!,object:WebExtension.MessageDelegate{
                 override fun onMessage(nativeApp:String,message:Any,sender:WebExtension.MessageSender):GeckoResult<Any>?{
-                    if(nativeApp=="frameEvidence" && message is JSONObject && message.optString("url").startsWith("https://m.youtube.com/"))samples.add(message)
+                    if(nativeApp=="frameEvidence" && message is JSONObject && android.net.Uri.parse(message.optString("url")).host in setOf("m.youtube.com","www.youtube.com","youtube.com"))samples.add(message)
                     return GeckoResult.fromValue<Any>(true)
                 }
             },"frameEvidence")
-            engine.load(url)
+            engine.saveHome(url)
         }
         rule.waitUntil(60000){samples.isNotEmpty()||engine.pageError.isNotEmpty()}
         Assert.assertTrue(engine.pageError,engine.pageError.isEmpty())

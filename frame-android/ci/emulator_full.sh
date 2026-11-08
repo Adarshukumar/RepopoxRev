@@ -12,6 +12,6 @@ smoke=$?
 echo "YouTube playback observation exit status: $smoke (0=passed; 124/137=timeout). Playback requires actual decoded frames and media time advance; ad removal is NOT established by an absence of ads." | tee screenshots/youtube-result.txt
 timeout 15s adb pull /sdcard/Download/. screenshots/ || true
 timeout 15s adb logcat -d > screenshots/youtube-logcat.txt || true
-grep -E "FrameTest|FrameWarmup" screenshots/youtube-logcat.txt | tail -20 >> screenshots/youtube-result.txt
+grep -E "FrameTest|FrameWarmup|FrameNetwork" screenshots/youtube-logcat.txt | tail -20 >> screenshots/youtube-result.txt
 tail -60 youtube.log >> screenshots/youtube-result.txt
 exit "$smoke"
