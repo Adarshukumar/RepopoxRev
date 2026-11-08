@@ -8,7 +8,8 @@
     }
   },
   "permissions": [
-    "nativeMessaging"
+    "nativeMessaging",
+    "geckoViewAddons"
   ],
   "content_scripts": [
     {
