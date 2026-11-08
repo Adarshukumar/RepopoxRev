@@ -65,10 +65,12 @@ class YouTubePlaybackTest {
     }
     @After fun evidence(){
         val inst=InstrumentationRegistry.getInstrumentation()
+        val engine=rule.activity.engine
+        android.util.Log.i("FrameTest","Playback end state: url=${engine.currentUrl}; title=${engine.title}; loading=${engine.loading}; error=${engine.pageError}; samples=${samples.size}")
         val dir=File("/sdcard/Download")
         // Use app-owned storage then copy via test shell; scoped-storage safe.
         val source=File(inst.targetContext.getExternalFilesDir(null),"youtube-playback-evidence.json")
-        source.writeText(JSONObject().put("samples",org.json.JSONArray(samples.map{it})).put("adMarkersObserved",samples.any{it.optBoolean("adMarker")}).put("limitation","Read-only observation. No visible ad does not prove an ad was removed; not a permanent ad-free guarantee.").put("observerError",failure).toString(2))
+        source.writeText(JSONObject().put("currentUrl",engine.currentUrl).put("documentTitle",engine.title).put("pageError",engine.pageError).put("samples",org.json.JSONArray(samples.map{it})).put("adMarkersObserved",samples.any{it.optBoolean("adMarker")}).put("limitation","Read-only observation. No visible ad does not prove an ad was removed; not a permanent ad-free guarantee.").put("observerError",failure).toString(2))
         inst.uiAutomation.executeShellCommand("cp ${source.absolutePath} $dir/youtube-playback-evidence.json").use{android.os.ParcelFileDescriptor.AutoCloseInputStream(it).readBytes()}
         val shot=File(inst.targetContext.getExternalFilesDir(null),"frame-06-youtube-playback.png")
         inst.uiAutomation.takeScreenshot()?.let{bmp->shot.outputStream().use{bmp.compress(android.graphics.Bitmap.CompressFormat.PNG,100,it)}}

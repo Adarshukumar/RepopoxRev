@@ -17,5 +17,5 @@ setInterval(() => {
         height: innerHeight,
         tapX: rect ? rect.x + rect.width / 2 : -1,
         tapY: rect ? rect.y + rect.height / 2 : -1
-    }).catch(() => {});
+    }).catch(error => console.warn("FrameEvidence", String(error)));
 }, 1000);

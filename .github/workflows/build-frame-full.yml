@@ -61,11 +61,11 @@ jobs:
         with:
           api-level: 35
           arch: x86_64
-          target: google_apis
+          target: default
           profile: pixel_6
-          ram-size: 4096M
-          heap-size: 512M
-          cores: 2
+          ram-size: 6144M
+          heap-size: 768M
+          cores: 4
           disable-animations: true
           working-directory: frame-android
           script: bash ci/emulator_full.sh
@@ -88,6 +88,8 @@ jobs:
             cat screenshots/extension-log.txt
             cat screenshots/system-errors.txt
             cat screenshots/youtube-result.txt
+            cat screenshots/youtube-diagnostics.txt
+            head -c 4000 screenshots/youtube-playback-evidence.json
             tail -15 screenshots/logcat-errors.txt
             echo '```'
           } > report.md

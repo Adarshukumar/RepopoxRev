@@ -14,4 +14,5 @@ timeout 15s adb pull /sdcard/Download/. screenshots/ || true
 timeout 15s adb logcat -d > screenshots/youtube-logcat.txt || true
 grep -E "FrameTest|FrameWarmup|FrameNetwork" screenshots/youtube-logcat.txt | tail -20 >> screenshots/youtube-result.txt
 tail -60 youtube.log >> screenshots/youtube-result.txt
+grep -Ei "GeckoConsole|FrameNetwork|FATAL EXCEPTION|am_crash|lowmemorykiller|lmkd|ANR in|FrameEvidence|NativeMessaging" screenshots/youtube-logcat.txt | tail -70 > screenshots/youtube-diagnostics.txt
 exit "$smoke"
