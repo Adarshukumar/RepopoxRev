@@ -12,6 +12,7 @@ on:
         default: false
 permissions:
   contents: write
+  actions: read
 concurrency:
   group: frame-full-${{ github.ref }}
   cancel-in-progress: true
