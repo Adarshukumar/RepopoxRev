@@ -48,3 +48,11 @@ youtube.log
 full-release-notes.md
 
 __pycache__/
+
+candidate/
+candidate-upstream/
+candidate-*.json
+candidate-*.txt
+candidate-*.log
+candidate-error.md
+device-release-notes.md
