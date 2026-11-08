@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -uo pipefail
+adb shell settings put system screen_off_timeout 1800000
+adb shell svc power stayon true
 bash ci/emulator.sh
 core=$?
 [ "$core" -eq 0 ] || exit "$core"

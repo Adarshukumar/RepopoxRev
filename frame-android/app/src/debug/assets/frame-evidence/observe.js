@@ -8,6 +8,8 @@ setInterval(() => {
     browser.runtime.sendMessage({
         url: location.origin + location.pathname,
         title: document.title,
+        mediaError: video?.error?.code || 0,
+        pageText: document.body.innerText.slice(0, 800),
         time: video?.currentTime || 0,
         paused: video?.paused ?? true,
         readyState: video?.readyState || 0,

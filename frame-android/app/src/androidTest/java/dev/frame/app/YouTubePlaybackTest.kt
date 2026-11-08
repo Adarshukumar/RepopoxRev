@@ -22,7 +22,7 @@ class YouTubePlaybackTest {
     @Test fun realVideoAdvancesWithFullUbo(){
         val engine=rule.activity.engine
         val url="https://m.youtube.com/watch?v=aqz-KE-bpKQ" // Blender Foundation's Big Buck Bunny
-        rule.runOnUiThread{engine.saveHome("about:blank")}
+        rule.runOnUiThread{rule.activity.window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);engine.saveHome("about:blank")}
         rule.waitUntil(150000){engine.ready||engine.installError.isNotEmpty()}
         Assert.assertTrue(engine.installError,engine.ready)
         rule.waitUntil(30000){engine.currentUrl=="about:blank" && !engine.loading}
@@ -44,7 +44,7 @@ class YouTubePlaybackTest {
         rule.waitUntil(60000){samples.isNotEmpty()||engine.pageError.isNotEmpty()}
         Assert.assertTrue(engine.pageError,engine.pageError.isEmpty())
         Assert.assertTrue("No actual YouTube document samples received",samples.isNotEmpty())
-        rule.waitUntil(45000){samples.last().optDouble("tapX",-1.0)>0}
+        rule.waitUntil(45000){samples.last().optDouble("tapX",-1.0)>0 && samples.last().optString("title").contains("Big Buck Bunny")}
         val sample=samples.last()
         val point=IntArray(2)
         rule.runOnUiThread{
@@ -66,6 +66,7 @@ class YouTubePlaybackTest {
     @After fun evidence(){
         val inst=InstrumentationRegistry.getInstrumentation()
         val engine=rule.activity.engine
+        android.util.Log.i("FrameTest","Last playback observation: ${samples.lastOrNull()}")
         android.util.Log.i("FrameTest","Playback end state: url=${engine.currentUrl}; title=${engine.title}; loading=${engine.loading}; error=${engine.pageError}; samples=${samples.size}")
         val dir=File("/sdcard/Download")
         // Use app-owned storage then copy via test shell; scoped-storage safe.
