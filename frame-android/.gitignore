@@ -46,3 +46,5 @@ app/src/main/assets/probe.json
 
 youtube.log
 full-release-notes.md
+
+__pycache__/
